@@ -1,0 +1,8 @@
+# 忽略任何目录下的DebugConfig文件夹
+DebugConfig/
+
+# 忽略任何目录下的Listings文件夹
+Listings/
+
+# 忽略任何目录下的Objects文件夹
+Objects/
