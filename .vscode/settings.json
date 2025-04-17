@@ -1,3 +1,7 @@
 {
-    "editor.fontSize": 20
+    "editor.fontSize": 20,
+    "files.associations": {
+        "*.c": "c",
+        "oled.h": "c"
+    }
 }

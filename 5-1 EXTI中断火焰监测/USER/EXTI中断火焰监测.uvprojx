@@ -134,7 +134,7 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4099</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\STM32F10x_FWLib\src;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\OLED;..\USER</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\STM32F10x_FWLib\src;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\OLED;..\HARDWARE\FIRE;..\USER</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -689,6 +689,16 @@
               <FileName>bmp.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\HARDWARE\OLED\bmp.h</FilePath>
+            </File>
+            <File>
+              <FileName>fire.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\FIRE\fire.c</FilePath>
+            </File>
+            <File>
+              <FileName>fire.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\HARDWARE\FIRE\fire.h</FilePath>
             </File>
           </Files>
         </Group>

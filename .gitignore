@@ -9,3 +9,24 @@ Objects/
 
 # 忽略任何目录下的OBJ文件夹
 OBJ/
+
+# 忽略任何目录下的.vscode文件夹
+.vscode/
+
+# 忽略所有的.scvd文件
+*.scvd
+
+# 忽略所有的.map文件
+*.map
+
+# 忽略所有的.jff_1文件
+*.jff_1
+
+# 忽略所有的.uvoptx文件
+*.uvoptx
+
+# 忽略所有的.lst文件
+*.lst
+
+# 忽略所有的.code-workspace文件
+*.code-workspace
