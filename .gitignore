@@ -6,3 +6,6 @@ Listings/
 
 # 忽略任何目录下的Objects文件夹
 Objects/
+
+# 忽略任何目录下的OBJ文件夹
+OBJ/
