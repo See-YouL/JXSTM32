@@ -3,7 +3,7 @@
  * 传感器链接: https://telesky.yuque.com/bdys8w/01/qyw1o22t6g5e278p
  * 传感器型号: 3针版
  * 注意事项: 当火焰强度超过阈值时,输出低电平,否则输出高电平
- * 传感器连接方法: DO 接 PB13
+ * 传感器连接方法: DO 接 PB14
  */
 #include "stm32f10x.h"                  // Device header
 #include "stm32f10x_exti.h"
