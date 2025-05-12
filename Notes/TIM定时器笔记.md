@@ -303,6 +303,16 @@ CSS: Clock Security System,时钟安全系统,可以监测外部时钟的运行�
 
 在timer文件夹中新建timer.c和timer.h文件
 
+### 硬件连接
+
+OLED连接
+
+- SCK 接 PG12
+- SDA 接 PD5
+- RES 接 PD4
+- DC 接 PD15
+- CS 接 PD1
+
 ### 常用库函数介绍
 
 在`stm32f10x_tim.h`文件中常用的库函数
@@ -574,3 +584,147 @@ void Timer_Init(void)
 ```
 
 此时复位后Num的值就为0了,不会立刻进入TIM2中断函数了.
+
+## 定时器外部时钟实验
+
+工程文件目录: `6-2 定时器外部时钟`
+
+[定时器外部时钟实验视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=14)
+
+实验目标: **每3次火焰传感器触发一次中断,在OLED上显示计数器的值**
+
+### 硬件连接
+
+OLED连接
+
+- SCK 接 PG12
+- SDA 接 PD5
+- RES 接 PD4
+- DC 接 PD15
+- CS 接 PD1
+
+火焰传感器连接
+
+- DO 接 PA0
+
+### 更换时钟源
+
+火焰传感器:当火焰强度超过阈值时,输出低电平,否则输出高电平,所以需要配置为下降沿触发
+
+TIM2的ETR引脚固定为PA0,故将火焰传感器的输出引脚连接到PA0,将PA0引脚设置为TIM2的ETR输入引脚,并且选择外部时钟模式2,下降沿有效
+
+在`timer.c`文件中,将时钟源改为外部时钟
+
+```c
+// 初始化TIM2外部时钟PA0
+void Timer_Init(void)
+{
+
+    // 1. 开启时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+
+    // PA0引脚配置
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // PA0引脚
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; // 浮空输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化PA0引脚
+
+    // 2. 选择时基单元时钟(默认使用内部时钟)
+    TIM_ETRClockMode2Config(TIM2, TIM_ExtTRGPSC_OFF, TIM_ExtTRGPolarity_Inverted, 0x00); // 配置TIM2使用ETR时钟走外部时钟模式2,下降沿有效 
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 3 - 1; // 在72MHz的频率下记3个数
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 1 - 1; // 对72M进行1分频得到72MHz
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure); // 初始化TIM2时基单元
+
+    // 避免复位立刻进入中断
+    TIM_ClearFlag(TIM2, TIM_FLAG_Update); // 清除TIM2更新中断标志位
+
+    // 4. 使能更新中断
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); // 使能TIM2更新中断
+
+    // 5. 配置NVIC
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置NVIC分组
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn; // 定时器2中断通道
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;	// 使能NVIC线路
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; // 响应优先级
+    NVIC_Init(&NVIC_InitStructure); // 初始化NVIC
+
+    // 6. 使能TIM2计数器
+    TIM_Cmd(TIM2, ENABLE); // 使能TIM2计数器
+
+}
+```
+
+关于PA0引脚配置的GPIO模式的选择,可参考下图
+
+![GPIO模式选择](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250513035334225.png)
+
+### 封装CNT计数器读取函数
+
+在`timer.c`文件中封装一个读取计数器的函数,在`timer.c`文件中实现
+
+```c
+uint16_t Timer_GetCounter(void)
+{
+    return TIM_GetCounter(TIM2); // 读取TIM2计数器的值
+}
+```
+
+### 完善主函数流程
+
+增加显示计数器的部分,在`main.c`文件中实现
+
+```c
+/*
+ * 实验目标: 每3次火焰传感器触发一次中断,在OLED上显示计数器的值
+ * 硬件连接:
+ *  OLED连接
+ * - SCK 接 PG12
+ * - SDA 接 PD5
+ * - RES 接 PD4
+ * - DC 接 PD15
+ * - CS 接 PD1
+ *  火焰传感器连接
+ * - DO 接 PA0
+ */
+ 
+#include "stm32f10x.h"                  // Device header
+#include "stm32f10x_conf.h"
+#include "delay.h"
+#include "sys.h"
+#include "oled.h"
+#include "bmp.h"
+#include "timer.h"
+
+// 1. 定义计数变量Num
+uint16_t Num = 0; // 定义一个变量用来计数
+
+int main(void)
+{
+    delay_init(); // 初始化延时函数
+	OLED_Init(); // 初始化OLED
+	Timer_Init(); // 初始化定时器2
+	
+	OLED_Clear(); // 清屏
+    OLED_ShowString(1, 1, "Num = ", 12); // 显示"Num ="
+    OLED_ShowString(2, 1, "CNT = ", 12); // 显示"CNT ="
+
+	while(1)
+	{
+        OLED_ShowNum(40, 1, Num, 5, 12); // 显示Num的值
+        OLED_ShowNum(40, 2, Timer_GetCounter(), 5, 12); // 显示计数器的值
+		OLED_Refresh();
+	}
+}
+
+```
+
