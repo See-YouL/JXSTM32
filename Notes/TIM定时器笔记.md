@@ -1,5 +1,14 @@
 # TIM 定时器笔记
 
+[TIM定时中断部分理论知识视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=13)
+
+**TIM定时中断包含如下内容**
+
+- TIM定时器简介
+- 定时中断基本结构
+- 时序图
+- RCC时钟树
+
 ## TIM 定时器简介
 
 定时器可以对输入的时钟进行计数,并在计数值达到设定值时触发中断.
@@ -281,3 +290,287 @@ CSS: Clock Security System,时钟安全系统,可以监测外部时钟的运行�
 ![外设时钟使能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512172429273.png)
 
 如上图所示,外设时钟使能就是程序中写RCC_APB2PeriphClockCmd和RCC_APB1PeriphClockCmd函数的地方,使能定时器的时钟,使能后定时器才能工作.
+
+## 定时器定时中断实验
+
+工程文件目录: `6-1 定时器定时中断`
+
+[TIM定时中断实验视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=14)
+
+实验目标: **使用定时器每秒自增变量在OLED上显示**
+
+在SYSTEM文件夹中新建timer文件夹用来存放关于定时器的代码文件
+
+在timer文件夹中新建timer.c和timer.h文件
+
+### 常用库函数介绍
+
+在`stm32f10x_tim.h`文件中常用的库函数
+
+```c
+void TIM_DeInit(TIM_TypeDef* TIMx); // 恢复缺省配置
+void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct); // 时基单元初始化
+void TIM_TimeBaseStructInit(TIM_TimeBaseInitTypeDef* TIM_TimeBaseInitStruct); // 把结构体变量赋一个默认值
+void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState); // 使能计数器
+void TIM_ITConfig(TIM_TypeDef* TIMx, uint16_t TIM_IT, FunctionalState NewState); // 使能中断输出信号
+void TIM_InternalClockConfig(TIM_TypeDef* TIMx); // 选择内部时钟模式
+void TIM_ITRxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource); // 选择ITRx其他定时器的时钟
+void TIM_TIxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_TIxExternalCLKSource,
+                                uint16_t TIM_ICPolarity, uint16_t ICFilter); // 选择TIx捕获通道的时钟
+void TIM_ETRClockMode1Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity,
+                             uint16_t ExtTRGFilter); // 选择ETR通过外部时钟模式1输入的时钟
+void TIM_ETRClockMode2Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, 
+                             uint16_t TIM_ExtTRGPolarity, uint16_t ExtTRGFilter); // 选择ETR通过外部时钟模式2输入的时钟
+void TIM_ETRConfig(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity,
+                   uint16_t ExtTRGFilter); // 配置ETR引脚的预分频器,极性和滤波器参数
+void TIM_PrescalerConfig(TIM_TypeDef* TIMx, uint16_t Prescaler, uint16_t TIM_PSCReloadMode); // 单独修改预分频值
+void TIM_CounterModeConfig(TIM_TypeDef* TIMx, uint16_t TIM_CounterMode); // 改变计数器的计数模式
+void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState); // 自动重装寄存器预装功能配置
+void TIM_SetCounter(TIM_TypeDef* TIMx, uint16_t Counter); // 给计数器写入一个值
+void TIM_SetAutoreload(TIM_TypeDef* TIMx, uint16_t Autoreload); // 给自动重装寄存器手动写一个值
+uint16_t TIM_GetCounter(TIM_TypeDef* TIMx); // 获取当前计数器的值
+uint16_t TIM_GetPrescaler(TIM_TypeDef* TIMx); // 获取当前预分频器的值
+/*
+ * 下面四个函数为获取和清楚标志位的函数
+ */
+FlagStatus TIM_GetFlagStatus(TIM_TypeDef* TIMx, uint16_t TIM_FLAG);
+void TIM_ClearFlag(TIM_TypeDef* TIMx, uint16_t TIM_FLAG);
+ITStatus TIM_GetITStatus(TIM_TypeDef* TIMx, uint16_t TIM_IT);
+void TIM_ClearITPendingBit(TIM_TypeDef* TIMx, uint16_t TIM_IT);
+
+```
+
+****
+
+时基单元时钟选择部分函数对应的流程图如下
+
+`void TIM_InternalClockConfig(TIM_TypeDef* TIMx); // 选择内部时钟模式`如下图所示
+
+![选择内部时钟模式](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512181243466.png)
+
+`void TIM_ITRxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource); // 选择ITRx其他定时器的时钟`如下图所示
+
+![选择ITRx其他定时器的时钟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512181539334.png)
+
+`void TIM_TIxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_TIxExternalCLKSource,uint16_t TIM_ICPolarity, uint16_t ICFilter); // 选择TIx捕获通道的时钟`如下图所示
+
+![选择TIx捕获通道的时钟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512181839401.png)
+
+`void TIM_ETRClockMode1Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler, uint16_t TIM_ExtTRGPolarity,uint16_t ExtTRGFilter); // 选择ETR通过外部时钟模式1输入的时钟`如下图所示
+
+![选择ETR通过外部时钟模式1输入的时钟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512182258546.png)
+
+`void TIM_ETRClockMode2Config(TIM_TypeDef* TIMx, uint16_t TIM_ExtTRGPrescaler,uint16_t TIM_ExtTRGPolarity, uint16_t ExtTRGFilter); // 选择ETR通过外部时钟模式2输入的时钟`如下图所示
+
+![选择ETR通过外部时钟模式2输入的时钟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512182434730.png)
+
+### 初始化定时器流程
+
+![初始化定时器流程](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512175339510.png)
+
+在`timer.c`文件中初始化定时器,大体步骤如下
+
+1. RCC开启时钟
+2. 选择时基单元的时钟源为内部时钟源
+3. 配置时基单元包括预分频器,自动重装器,计数模式等
+4. 配置输出中断控制允许更新中断输出到NVIC
+5. 配置NVIC,在NVIC中打开定时器中断的通道,并分配一个优先级
+6. 运行控制,使能计数器
+7. 写一个定时器2中断函数
+
+```c
+// 初始化TIM2
+void Timer_Init(void)
+{
+    // 1. 开启时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
+
+    // 2. 选择时基单元时钟(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM2); // 选择内部时钟
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1; // 在10k的频率下记10000个数需要1s时间
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 7200 - 1; // 对72M进行7200分频得到10kHz
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure); // 初始化TIM2时基单元
+
+    // 4. 使能更新中断
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); // 使能TIM2更新中断
+
+    // 5. 配置NVIC
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置NVIC分组
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn; // 定时器2中断通道
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;	// 使能NVIC线路
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; // 响应优先级
+    NVIC_Init(&NVIC_InitStructure); // 初始化NVIC
+
+    // 6. 使能TIM2计数器
+    TIM_Cmd(TIM2, ENABLE); // 使能TIM2计数器
+
+}
+
+// 7. 定时器2中断函数
+void TIM2_IRQHandler(void)
+{
+    if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) // 判断是否为更新中断
+    {
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Update); // 清除更新中断标志位
+        // 这里写定时器中断要执行的代码
+    }
+}
+
+```
+
+TIM_TimeBaseInitTypeDef结构体中`TIM_ClockDivision`成员的作用:
+
+![输入滤波](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250513013833761.png)
+
+上图所示的输入滤波器在一个固定的时钟频率f下进行采样,如果连续N个采样点都为相同的电平,则表示输入信号稳定了,就把这个采样值输出出去;如果这N个采样点不全都相同,就说明信号有抖动,这时就保持上一次的输出或者直接输出低电平,这样就能保证输出信号在一定程度上的滤波.
+
+上述中的采样频率f可以由内部时钟直接而来,也可是由内部时钟加一个时钟分频而来,**其中分频多少就由TIM_ClockDivision成员来决定**.
+
+计时时间的计算公式和参数选择如下:
+
+`T = 1 / CK_CNT_OV = 1 / (CK_PSC / (PSC + 1) / (ARR + 1))`
+
+若实现1s的定时,则CK_CNT_OV=1Hz,CK_PSC=72MHz,PSC=7200-1,ARR=10000-1
+
+```c
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+	TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1;
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 7200 - 1;
+```
+
+也可理解为,对72M进行7200分频得到10kHz,在10k的频率下记10000个数需要1s时间
+
+### 主函数完善流程
+
+在`main.c`文件中实现
+
+1. 定义计数变量Num
+2. 调用初始化定时器的函数
+3. 在主函数中调用OLED显示Num的值
+
+
+```c
+/*
+ * 实验目标: 使用定时器每秒自增变量在OLED上显示
+ */
+ 
+#include "stm32f10x.h"                  // Device header
+#include "stm32f10x_conf.h"
+#include "delay.h"
+#include "sys.h"
+#include "oled.h"
+#include "bmp.h"
+#include "timer.h"
+
+// 1. 定义计数变量Num
+uint16_t Num = 0; // 定义一个变量用来计数
+
+int main(void)
+{
+	delay_init(); // 初始化延时函数
+	OLED_Init(); // 初始化OLED
+
+    // 2. 调用初始化定时器的函数
+	Timer_Init(); // 初始化定时器2
+	
+    // 3. 在主函数中调用OLED显示Num的值
+	OLED_Clear(); // 清屏
+    OLED_ShowString(1, 1, "Num = ", 12); // 显示"Num ="
+
+	while(1)
+	{
+        OLED_ShowNum(40, 1, Num, 5, 12); // 显示Num的值
+		OLED_Refresh();
+	}
+}
+
+```
+
+### 完善中断服务函数
+
+在`TIM2_IRQHandler`中断函数中实现Num自增,在`timer.c`文件中实现
+
+```c
+extern uint16_t Num; // 在timer.c中声明跨文件Num变量
+
+// 定时器2中断函数
+void TIM2_IRQHandler(void)
+{
+    if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) // 判断是否为更新中断
+    {
+        Num++;
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Update); // 清除更新中断标志位
+    }
+}
+
+```
+
+使用`extern`关键字可以在其他文件中引用Num变量,这样就可以在定时器中断函数中自增Num变量了.
+
+### 复位立刻进入中断的问题
+
+**问题描述:** 经测试,在如上代码的条件下进行测试,发现复位后Num的值是从1开始而不是从0开始,说明复位立刻进入了TIM2中断函数,这时Num的值已经自增了,所以Num的值是1,而不是0.
+
+**问题成因分析:** 在`TIM_TimeBaseInit`函数函数中,如下图所示
+
+![TIM_TimeBaseInit函数截图](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250513031817121.png)
+
+注释内容: 立刻生成一个更新事件以重新装载预分频器和重复计数器的值.
+
+预分频器有个缓冲寄存器,我们写的值只有在更新事件时才会真正起作用,所以这里为了让值立刻起作用,就在这里立刻生成一个更新事件,这时就会触发TIM2中断函数,所以Num的值自增了1. 
+
+**解决方法:** 在`TIM_TimeBaseInit`函数之后,开启中断之前,手动调用`TIM_ClearFlag`函数,将更新中断标志位手动清除一下.
+
+即在3.配置时基单元和4.使能更新中断之间加入`TIM_ClearFlag(TIM2, TIM_FLAG_Update)`
+
+在`timer.c`文件中实现如下
+
+```c
+// 初始化TIM2
+void Timer_Init(void)
+{
+    // 1. 开启时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
+
+    // 2. 选择时基单元时钟(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM2); // 选择内部时钟
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1; // 在10k的频率下记10000个数需要1s时间
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 7200 - 1; // 对72M进行7200分频得到10kHz
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure); // 初始化TIM2时基单元
+
+    // 避免复位立刻进入中断
+    TIM_ClearFlag(TIM2, TIM_FLAG_Update); // 清除TIM2更新中断标志位
+
+    // 4. 使能更新中断
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); // 使能TIM2更新中断
+
+    // 5. 配置NVIC
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置NVIC分组
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn; // 定时器2中断通道
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;	// 使能NVIC线路
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2; // 抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1; // 响应优先级
+    NVIC_Init(&NVIC_InitStructure); // 初始化NVIC
+
+    // 6. 使能TIM2计数器
+    TIM_Cmd(TIM2, ENABLE); // 使能TIM2计数器
+
+}
+```
+
+此时复位后Num的值就为0了,不会立刻进入TIM2中断函数了.
