@@ -65,6 +65,8 @@ GPIO模式
 
 ## 实验测试
 
+工程文件目录: `3-2 GPIO输出-LED闪烁`
+
 [GPIO输出实验测试视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=6)
 
 ### 实验目标
