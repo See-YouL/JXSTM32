@@ -1,6 +1,10 @@
 # GPIO输入笔记
 
+[GPIO输入理论知识视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=7)
+
 ## 实验测试
+
+[GPIO输入理论知识视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=8)
 
 ### LED驱动
 

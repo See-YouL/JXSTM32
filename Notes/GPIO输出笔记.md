@@ -2,6 +2,8 @@
 
 ## 理论知识
 
+[GPIO输出理论知识视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=5)
+
 ### GPIO简介
 
 共八种输入输出模式，引脚电平为0V~3.3V, 部分引脚可容忍5V电平。
@@ -62,6 +64,8 @@ GPIO模式
 ![复用开漏/推挽输出](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250415234440037.png)
 
 ## 实验测试
+
+[GPIO输出实验测试视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=6)
 
 ### 实验目标
 
