@@ -1,5 +1,12 @@
 /*
  * 实验目标: 使用定时器每秒自增变量在OLED上显示
+ * 硬件连接:
+ *  OLED连接
+ * - SCK 接 PG12
+ * - SDA 接 PD5
+ * - RES 接 PD4
+ * - DC 接 PD15
+ * - CS 接 PD1
  */
  
 #include "stm32f10x.h"                  // Device header

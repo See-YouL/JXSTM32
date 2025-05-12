@@ -1,5 +1,14 @@
 /*
  * 实验目标: 使用火焰传感器监测火焰并通过OLED屏显示火焰警报
+ * 硬件连接:
+ *  OLED连接
+ * - SCK 接 PG12
+ * - SDA 接 PD5
+ * - RES 接 PD4
+ * - DC 接 PD15
+ * - CS 接 PD1
+ *  火焰传感器连接
+ * - DO 接 PB14
  */
  
 #include "stm32f10x.h"                  // Device header
