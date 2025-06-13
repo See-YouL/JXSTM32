@@ -1,6 +1,8 @@
 # TIM 定时器笔记
 
-[TIM定时中断部分理论知识视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=13)
+## 目录结构
+
+[TIM定时中断部分理论知识视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=13&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
 **TIM定时中断包含如下内容**
 
@@ -8,6 +10,23 @@
 - 定时中断基本结构
 - 时序图
 - RCC时钟树
+
+[定时器定时中断实验/定时器外部时钟实验视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=14&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+**定时器定时中断实验/定时器外部中断实验包含如下内容**
+
+- 定时器定时中断实验
+- 定时器外部时钟实验
+
+[TIM输出比较部分理论知识视频链]( https://www.bilibili.com/video/BV1th411z7sn/?p=15&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+**TIM输出比较包含如下内容**
+
+- 定时器输出比较简介
+- PWM简介
+- 输出比较通道(通用定时器)
+- PWM基本结构
+- 输出比较通道(高级定时器)
 
 ## TIM 定时器简介
 
@@ -294,8 +313,6 @@ CSS: Clock Security System,时钟安全系统,可以监测外部时钟的运行�
 ## 定时器定时中断实验
 
 工程文件目录: `6-1 定时器定时中断`
-
-[TIM定时中断实验视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=14)
 
 实验目标: **使用定时器每秒自增变量在OLED上显示**
 
@@ -589,8 +606,6 @@ void Timer_Init(void)
 
 工程文件目录: `6-2 定时器外部时钟`
 
-[定时器外部时钟实验视频链接](https://www.bilibili.com/video/BV1th411z7sn?spm_id_from=333.788.videopod.episodes&vd_source=82fdaa13f57d339420a33b8e98a53858&p=14)
-
 实验目标: **每3次火焰传感器触发一次中断,在OLED上显示计数器的值**
 
 ### 硬件连接
@@ -727,4 +742,121 @@ int main(void)
 }
 
 ```
+
+## 定时器输出比较简介
+
+OC(Output Compare)输出比较是定时器的一个功能,可以用来产生PWM波形,控制外设的输出等.
+
+输出比较可以通过比较CNT与CCR寄存器值的关系,来对输出电平进行置1,置0或翻转的操作,用于输出一定频率
+和占空比的PWM波形
+
+CNT与CCR寄存器的关系如下图所示
+
+![CNT与CCR寄存器](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613165759.png)
+
+- CNT是时基单元里的计数器
+- CCR是捕获/比较寄存器,该寄存器是输入捕获和输出比较公用的
+- 通过比较CNT和CCR的值,其中CNT计数自增,CCR是给定的值,当CNT大于,小于,等于CCR时,可以对输出进行置1,置0等操作
+- 从而在TIMx_CH1~TIMx_CH4引脚上产生PWM波形
+
+****
+
+每个高级定时器和通用定时器都拥有4个输出比较通道,如下图所示
+
+![基本定时器无输出比较功能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171429.png)
+
+![通用定时器有4个输出比较通道](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171602.png)
+
+![高级定时器有4个输出比较通道](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171713.png)
+
+****
+
+高级定时器的前3个通道额外拥有死区生成和互补输出的功能,如下图所示
+
+![死区生成和互补输出功能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171832.png)   
+
+## PWM简介
+
+PWM(Pulse Width Modulation)脉冲宽度调制
+
+在具有惯性的系统中,可以通过对一系列脉冲的宽度进行调制,来等效地获得所需要的模拟参量,常用于电机控速等领域.
+
+![PWM等效模拟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613172702.png)
+
+*如上图所示,黑色的数字信号为实际信号,紫色的正弦波信号为通过PWM的等效出来的模拟信号*
+
+PWM参数:
+
+- 频率 = 1 / Ts
+- 占空比 = Ton / Ts
+- 分辨率 = 占空比变化步距, 如分辨率可以1.1%,1.2%,1.3%跳变则分辨率为0.1w
+
+![PWM参数](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613173310.png)
+
+## 输出比较通道(通用定时器)
+
+![输出比较通道通用定时器](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613174155.png)
+
+*上图捕获/比较通道的输出部分在通用定时器框图中的对应关系如下图所示*
+
+![在通用定时器框图中的对应关系](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613174726.png)
+
+*如上图所示,输入部分为CNT与CCR的比较结果,输出部分为TIMx_CH1~TIMx_CH4引脚的输出*
+
+![流程分析](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613180753.png)
+
+1. 通过比较CNT与CCR1的大小关系,输出模式控制器会改变oc1ref的高低电平
+2. oc1ref信号可以被映射到主模式的TRGO输出
+3. TIMx_CCER为极性选择,写0信号会往上走即电平不翻转,写1会经过逻辑非门即电平翻转
+4. 输出使能电路,选择是否输出
+5. OC1引脚就是CH1通道的引脚,在引脚定义表里就可以知道具体是哪个GPIO口
+
+### 输出比较模式
+
+![输出比较模式对应](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613181411.png)
+
+*如上图所示,输出比较模式对应该框图中输出模式控制器的执行逻辑*
+
+![输出比较模式](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613181448.png)
+
+输出模式控制器**输入为CNT与CCR的比较结果,输出为oc1ref的高低电平**,可选择多种模式来控制REF输出,**模式的选择可以通过寄存器TIMx_CCMR1来进行配置**
+
+## PWM基本结构
+
+![PWM基本结构框图](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613184816.png)
+
+![PWM波形分析](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613185159.png)
+
+1. 在1阶段时, CNT < CCR, REF置有效电平
+2. 在2阶段时, CNT >= CCR, REF置无效电平
+
+*如上图所示, 通过调节CCR的值即可调节PWM波的占空比*
+
+### PWM的参数计算
+
+![PWM的参数计算](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613191338.png)
+
+*如上图所示,PWM的频率 = 计数器的更新频率*
+
+## 输出比较通道(高级定时器)
+
+![输出比较通道(高级定时器)](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613192252.png)
+
+*如上图所示,高级定时器的输出比较通道与通用定时器的输出比较通道的区别在于,高级定时器的输出比较通道有死区生成和互补输出的功能, 即上图中红框部分*
+
+![推挽电路](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613193511.png)
+
+*高级定时器的输出比较电路的输出一般会接上图所示的推挽电路*
+
+1. Q1导通,Q2断开,输出高电平
+2. Q1断开,Q2导通,输出低电平
+3. Q1和Q2都断开,输出高阻态
+4. Q1和Q2都导通,输出短路,不允许
+
+**两个推挽电路构成H桥电路可以控制直流电机正反转;三个推挽电路可以驱动三相无刷电机**,OC1和OC1N为互补的的输出端口,分别控制上下管的导通和关断.
+
+在切换上下管导通状态时,可能因为器件的不理想出现短暂的上下管同事导通的现象,会导致功率损耗,引起器件发热.**为避免这个问题,使用死区生成电路会在上下管切换时,在切换的过程中插入一个死区时间,使得上下管不会同时导通.**
+
+
+
 
