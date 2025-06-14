@@ -27,13 +27,13 @@ int main(void)
         for(i = 0; i <= 100; i++)
         {
             PWM_SetCompare1(i); // 设置PWM占空比
-            Delay_ms(10); // 延时10ms
+            delay_ms(10); // 延时10ms
         }
 
         for(i = 0; i <= 100; i++)
         {
             PWM_SetCompare1(100 - i); // 设置PWM占空比
-            Delay_ms(10); // 延时10ms
+            delay_ms(10); // 延时10ms
         }
 	}
 }
