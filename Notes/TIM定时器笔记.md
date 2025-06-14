@@ -28,6 +28,12 @@
 - PWM基本结构
 - 输出比较通道(高级定时器)
 
+[PWN驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=16&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+**PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内容**
+
+- PWM驱动LED呼吸灯实验
+
 ## TIM 定时器简介
 
 定时器可以对输入的时钟进行计数,并在计数值达到设定值时触发中断.
