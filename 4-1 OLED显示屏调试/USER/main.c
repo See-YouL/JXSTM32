@@ -6,7 +6,8 @@
  * DC 接 PD15
  * CS 接 PD1
  */
-
+#include "stm32f10x.h"
+#include "stm32f10x_conf.h"
 #include "delay.h"
 #include "sys.h"
 #include "oled.h"

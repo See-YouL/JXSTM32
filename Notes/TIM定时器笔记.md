@@ -626,7 +626,15 @@ OLED连接
 
 火焰传感器:当火焰强度超过阈值时,输出低电平,否则输出高电平,所以需要配置为下降沿触发
 
-TIM2的ETR引脚固定为PA0,故将火焰传感器的输出引脚连接到PA0,将PA0引脚设置为TIM2的ETR输入引脚,并且选择外部时钟模式2,下降沿有效
+**TIM2的ETR引脚固定为PA0**,故将火焰传感器的输出引脚连接到PA0,将PA0引脚设置为TIM2的ETR输入引脚,并且选择外部时钟模式2,下降沿有效
+
+*在STM32F103x的数据手册中第三节引脚定义中可查到默认复用功能,如下图所示*
+
+![数据手册](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614193542.png)
+
+*在STM32F10x参考手册中8.3.7定时器复用功能重映射可找到TIM2的复用影响,如下图所示*
+
+![参考手册](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614194006.png)
 
 在`timer.c`文件中,将时钟源改为外部时钟
 
@@ -857,6 +865,254 @@ PWM参数:
 
 在切换上下管导通状态时,可能因为器件的不理想出现短暂的上下管同事导通的现象,会导致功率损耗,引起器件发热.**为避免这个问题,使用死区生成电路会在上下管切换时,在切换的过程中插入一个死区时间,使得上下管不会同时导通.**
 
+## PWM驱动LED呼吸灯实验
 
+工程文件目录: `6-3 PWM驱动LED呼吸灯`
 
+实验目标: **实现LED呼吸灯**
 
+在HARDWARE文件夹中添加`PWM.c`和`PWM.h`文件
+
+### 硬件连接
+
+TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器复用功能重映射**章节中查看,*如下图所示*
+
+![TIM2_CH1的复用功能重映射](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614195759.png)
+
+需要将LED的正极连接到TIM2_CH1引脚(PA0),负极连接到GND
+
+### 常用库函数
+
+在`stm32f10x_tim.h`文件中常用的库函数
+
+```c
+void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+```
+
+- TIMx: 选择定时器
+- TIM_OCInitStruct: 结构体变量,输出比较的参数
+
+`用来配置输出比较模块,如下图所示`
+
+![输出比较模块](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613231141.png)
+
+****
+
+```c
+void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct);
+```
+
+用来给输出比较结构体赋默认值
+
+****
+
+```c
+void TIM_ForcedOC1Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC2Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC3Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+void TIM_ForcedOC4Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction);
+```
+
+用来配置强制输出模式,**在运行中想要暂停输出波形并且强制输出高/低电平**可用该函数
+
+****
+
+```c
+void TIM_OC1PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC2PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC3PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+void TIM_OC4PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+```
+
+用来配置输出比较预装载功能,**在运行中想要修改CCR寄存器的值,需要开启预装载功能,否则修改的值不会生效**
+
+****
+
+```c
+void TIM_OC1PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC1NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC2PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC2NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC3PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+void TIM_OC3NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity);
+void TIM_OC4PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity);
+```
+
+用来单独设置输出比较的极性,带N的为高级定时器里互补通道的配置
+
+****
+
+```c
+void TIM_CCxCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCx);
+void TIM_CCxNCmd(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_CCxN);
+```
+
+用来单独修改输出使能参数
+
+****
+
+```c
+void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode);
+```
+
+用来单独更改输出比较模式的函数
+
+****
+
+```c
+void TIM_SetCompare1(TIM_TypeDef* TIMx, uint16_t Compare1);
+void TIM_SetCompare2(TIM_TypeDef* TIMx, uint16_t Compare2);
+void TIM_SetCompare3(TIM_TypeDef* TIMx, uint16_t Compare3);
+void TIM_SetCompare4(TIM_TypeDef* TIMx, uint16_t Compare4);
+```
+
+用来单独更改CCR寄存器值的函数,**更改占空比使用该函数**
+
+****
+
+```c
+void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
+```
+
+仅高级定时器使用,在使用高级定时器输出PWM时需要调用该函数使能主输出,否则无法输出PWM波形
+
+### PWM初始化函数
+
+TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器复用功能重映射**章节中查看,*如下图所示*
+
+![TIM2_CH1的复用功能重映射](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614195759.png)
+
+TIM2_CHx的GPIO配置可在STM32F10x参考手册的**8.1.11外设的GPIO配置**章节中查看,*如下图所示*
+
+![TIM2_CHx的GPIO配置](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614195516.png)
+
+所以, 应该使用**PA0作为LED灯的PWM输出引脚,将PA0引脚设置为TIM2_CH1的复用推挽输出模式**
+
+```c
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // 选择PA0引脚
+GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
+GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+```
+
+****
+
+参数计算
+
+- PWM频率计算公式: Freq = CK_PSC / (PSC + 1) / (ARR + 1)
+- PWM占空比: Duty = CCR / (ARR + 1)
+- PWM分辨率: Res = 1 / (ARR + 1)
+
+若产生一个 **频率为1KHz,占空比为50%,分辨率为1%** 的PWM波形,则
+
+- 1KHz = 72MHz / (PSC + 1) / (ARR + 1)
+- 50% = CCR / (ARR + 1)
+- 1% = 1 / (ARR + 1)
+
+解得
+
+- (ARR + 1) = 100
+- CCR = 50
+- (PSC + 1) = 720
+
+```c
+TIM_TimeBaseInitStructure.TIM_Period = 100 - 1; // ARR + 1 = 100  
+TIM_TimeBaseInitStructure.TIM_Prescaler = 720 - 1; // PSC + 1 = 720
+TIM_OCInitStructure.TIM_Pulse = 50; // CCR = 50
+```
+
+****
+
+PWM初始化流程:
+
+1. RCC开启时钟,打开TIM外设和GPIO外设的时钟
+2. 选择时基单元时钟源
+3. 配置时基单元
+4. 配置输出比较通道
+5. 配置PWM对应的GPIO口为复用推挽输出模式
+6. 运行控制,启动计数器
+
+```c
+void PWM_Init(void)
+{
+    // 1. 开启时钟, 打开TIM2外设和GPIO外设的时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+
+    // 2. 选择时基单元时钟源(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM2); // 选择内部时钟
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 100 - 1; // ARR + 1 = 100  
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 720 - 1; // PSC + 1 = 720
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure); // 初始化TIM2时基单元
+
+    // 4. 配置输出比较通道
+    TIM_OCInitTypeDef TIM_OCInitStructure; // 定义输出比较结构体
+    TIM_OCStructInit(&TIM_OCInitStructure); // 初始化输出比较结构体
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; // 设置输出比较模式为PWM1
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // 设置输出极性为高
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; // 使能输出比较
+    TIM_OCInitStructure.TIM_Pulse = 50; // CCR = 50
+    TIM_OC1Init(TIM2, &TIM_OCInitStructure);
+
+    // 5. 配置PWM对应的GPIO
+    GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // 选择PA0引脚
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+
+    // 6. 运行控制,启动计数器
+    TIM_Cmd(TIM2, ENABLE); // 使能TIM2计数器
+
+}
+
+```
+
+### 实现呼吸灯效果
+
+在`PWM.c`文件中实现一个设置CCR值的函数
+
+```c
+void PWM_SetCompare1(uint16_t Compare)
+{
+    TIM_SetCompare1(TIM2, Compare); // 设置TIM2通道1的比较值
+}
+```
+
+在`main.c`文件中实现呼吸灯效果
+
+```c
+uint8_t i;
+
+int main(void)
+{
+	delay_init();
+    PWM_Init(); // TIM2的PWM初始化
+
+	while(1)
+	{
+        for(i = 0; i <= 100; i++)
+        {
+            PWM_SetCompare1(i); // 设置PWM占空比
+            Delay_ms(10); // 延时10ms
+        }
+
+        for(i = 0; i <= 100; i++)
+        {
+            PWM_SetCompare1(100 - i); // 设置PWM占空比
+            Delay_ms(10); // 延时10ms
+        }
+	}
+}
+```
