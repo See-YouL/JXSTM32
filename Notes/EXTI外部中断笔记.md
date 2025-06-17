@@ -23,7 +23,7 @@
 
 ### NVIC优先级分组
 
-![NVIC优先级分组](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250418010043897.png) 
+![NVIC优先级分组](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250418010043897.png)
 
 ### EXTI简介
 

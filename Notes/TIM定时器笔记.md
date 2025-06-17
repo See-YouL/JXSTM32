@@ -4,7 +4,7 @@
 
 [TIM定时中断部分理论知识视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=13&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
-**TIM定时中断包含如下内容**
+TIM定时中断包含如下内容
 
 - TIM定时器简介
 - 定时中断基本结构
@@ -13,14 +13,14 @@
 
 [定时器定时中断实验/定时器外部时钟实验视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=14&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
-**定时器定时中断实验/定时器外部中断实验包含如下内容**
+定时器定时中断实验/定时器外部中断实验包含如下内容
 
 - 定时器定时中断实验
 - 定时器外部时钟实验
 
 [TIM输出比较部分理论知识视频链]( https://www.bilibili.com/video/BV1th411z7sn/?p=15&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
-**TIM输出比较包含如下内容**
+TIM输出比较包含如下内容
 
 - 定时器输出比较简介
 - PWM简介
@@ -30,7 +30,7 @@
 
 [PWN驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=16&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
-**PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内容**
+PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内容
 
 - PWM驱动LED呼吸灯实验
 
@@ -72,7 +72,6 @@
 主模式可以把定时器的更新事件映射到触发输出控制器的TRGO位置,TRGO直接接到DAC的触发转换引脚上,可以
 直接触发DAC的转换,不需要额外触发中断.
 
-
 ### 通用定时器
 
 ![通用定时器的时基单元部分](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250510233537087.png)
@@ -91,13 +90,13 @@
 
 ![外部时钟模式2](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250510234454628.png)
 
-*如上图所示,选择外部时钟TIMx_ETR作为外部时钟源->预分频器->输入滤波->触发控制器->时基单元,这一路也被叫作外部时钟模式2*
+如上图所示,选择外部时钟TIMx_ETR作为外部时钟源->预分频器->输入滤波->触发控制器->时基单元,这一路也被叫作外部时钟模式2
 
 选择外部时钟源为TIMx_ETR, TIMx_ETR引脚的映射参考引脚映射表,如下
 
 ![TIM2_CH1_ETR映射表](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511030909964.png)
 
-*如上图所示, TIM1_CH1_ETR映射在PA0引脚上*
+如上图所示, TIM1_CH1_ETR映射在PA0引脚上
 
 ****
 
@@ -115,13 +114,13 @@
 
 ![ITR作外部时钟走外部时钟模式1](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511032303569.png)
 
-*如上图红线所示,使用ITR作外部时钟走外部时钟模式1的路线;如上图所示蓝线,TRGO输出可通向其他定时器,如ITR*
+如上图红线所示,使用ITR作外部时钟走外部时钟模式1的路线;如上图所示蓝线,TRGO输出可通向其他定时器,如ITR
 
 ITR0-3分别来自其他定时器的TRGO输出,如下图所示
 
 ![TIMx内部触发连接](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511032603568.png)
 
-*如上图所示,TIM2的ITR0接在了TIM1的TRGO上,TIM2的ITR1接在TIM8的TRGO上等等*
+如上图所示,TIM2的ITR0接在了TIM1的TRGO上,TIM2的ITR1接在TIM8的TRGO上等等
 
 通过TIMx内部触发连接的关系可以实现定时器级联的功能,*比如可以初始化TIM3,使用主模式把它的更新事件映射到TRGO上,再初始化TIM2,选择ITR2对应着TIM3的TRGO,再选择时钟为外部时钟模式1*,这样TIM3的更新事件就可以驱动TIM2的时基单元,实现定时器级联的功能.
 
@@ -131,7 +130,7 @@ ITR0-3分别来自其他定时器的TRGO输出,如下图所示
 
 ![TI1F_ED作外部时钟走外部时钟模式1](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511033311304.png)
 
-*如上图红线所示,使用TI1F_ED作外部时钟走外部时钟模式1的路线,ED是Edge边沿的意思,通过这一路输入的时钟,上升沿和下降沿均有效*
+如上图红线所示,使用TI1F_ED作外部时钟走外部时钟模式1的路线,ED是Edge边沿的意思,通过这一路输入的时钟,上升沿和下降沿均有效
 
 ****
 
@@ -139,7 +138,7 @@ ITR0-3分别来自其他定时器的TRGO输出,如下图所示
 
 ![TI1FP1和TI2FP2作外部时钟走外部时钟模式1](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511033756964.png)
 
-*如上图红线所示,使用TI1FP1和TI2FP2作外部时钟走外部时钟模式1的路线*
+如上图红线所示,使用TI1FP1和TI2FP2作外部时钟走外部时钟模式1的路线
 
 总结:**对于通用定时器可选择外部时钟如ETR引脚,其他定时器,CH1引脚的边沿,CH1引脚和CH2引脚.**
 
@@ -187,20 +186,19 @@ ITR0-3分别来自其他定时器的TRGO输出,如下图所示
 
 ![基本定时器框图CK_PSC](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511234340343.png)
 
-*其中CK_PSC为预分频器的输入时钟,选内部时钟则为72MHz,不断运行*
+其中CK_PSC为预分频器的输入时钟,选内部时钟则为72MHz,不断运行
 
 ![预分频器时序CNT_EN](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511234859878.png)
 
 CNT_EN为计数器使能,高电平时计数器正常运行,低电平计数器停止,*如上图所示,在红线时CNT_EN使能,计数器正常运行*
 
-
 ![预分频器时序CK_CNT](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511235928683.png)
 
-*当CNT_EN为低电平时,定时器时钟未使能,当CNT_EN为高电平时,此时预分频器系数为1,定时器时序与CK_PSC一致,当预分频器系数变为2时,定时器时序为CK_PSC的一半*
+当CNT_EN为低电平时,定时器时钟未使能,当CNT_EN为高电平时,此时预分频器系数为1,定时器时序与CK_PSC一致,当预分频器系数变为2时,定时器时序为CK_PSC的一半
 
 ![基本定时器框图CK_CNT](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250511235258985.png)
 
-*CK_CNT为计数器时钟,既是预分频器PSC的时钟输出,又是CNT计数器的时钟输入*
+CK_CNT为计数器时钟,既是预分频器PSC的时钟输出,又是CNT计数器的时钟输入
 
 ![预分频器时序计数器寄存器](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250512000545400.png)
 
@@ -237,7 +235,7 @@ CNT_EN为计数器使能,高电平时计数器正常运行,低电平计数器停
 
 计数器溢出频率`CK_CNT_OV = CK_CNT / (ARR + 1) = CK_PSC / (PSC+1) / (ARR + 1)`
 
-由计数器溢出频率公式可计算定时时间 ` T = 1 / CK_CNT_OV`
+由计数器溢出频率公式可计算定时时间 `T = 1 / CK_CNT_OV`
 
 ### 计数器无预装时序
 
@@ -261,7 +259,7 @@ CNT_EN为计数器使能,高电平时计数器正常运行,低电平计数器停
 3. 在3阶段时,计数器寄存器自增到F5时,产生更新事件,此时自动加载影子寄存器的值改为36,这时计数的目标值生效
 4. 在4阶段时,计数的目标值变为36
 
-*引入影子寄存器的目的是为了让目标值的变化和更新事件同步发生,避免在计数途中进行更改造成错误*
+引入影子寄存器的目的是为了让目标值的变化和更新事件同步发生，避免在计数途中进行更改造成错误。
 
 ## RCC时钟树
 
@@ -326,7 +324,7 @@ CSS: Clock Security System,时钟安全系统,可以监测外部时钟的运行�
 
 在timer文件夹中新建timer.c和timer.h文件
 
-### 硬件连接
+### 硬件连接（定时中断实验）
 
 OLED连接
 
@@ -489,7 +487,6 @@ TIM_TimeBaseInitTypeDef结构体中`TIM_ClockDivision`成员的作用:
 2. 调用初始化定时器的函数
 3. 在主函数中调用OLED显示Num的值
 
-
 ```c
 /*
  * 实验目标: 使用定时器每秒自增变量在OLED上显示
@@ -558,7 +555,7 @@ void TIM2_IRQHandler(void)
 
 注释内容: 立刻生成一个更新事件以重新装载预分频器和重复计数器的值.
 
-预分频器有个缓冲寄存器,我们写的值只有在更新事件时才会真正起作用,所以这里为了让值立刻起作用,就在这里立刻生成一个更新事件,这时就会触发TIM2中断函数,所以Num的值自增了1. 
+预分频器有个缓冲寄存器,我们写的值只有在更新事件时才会真正起作用,所以这里为了让值立刻起作用,就在这里立刻生成一个更新事件,这时就会触发TIM2中断函数,所以Num的值自增了1.
 
 **解决方法:** 在`TIM_TimeBaseInit`函数之后,开启中断之前,手动调用`TIM_ClearFlag`函数,将更新中断标志位手动清除一下.
 
@@ -614,7 +611,7 @@ void Timer_Init(void)
 
 实验目标: **每3次火焰传感器触发一次中断,在OLED上显示计数器的值**
 
-### 硬件连接
+### 硬件连接（外部时钟实验）
 
 OLED连接
 
@@ -634,11 +631,11 @@ OLED连接
 
 **TIM2的ETR引脚固定为PA0**,故将火焰传感器的输出引脚连接到PA0,将PA0引脚设置为TIM2的ETR输入引脚,并且选择外部时钟模式2,下降沿有效
 
-*在STM32F103x的数据手册中第三节引脚定义中可查到默认复用功能,如下图所示*
+在STM32F103x的数据手册中第三节引脚定义中可查到默认复用功能,如下图所示
 
 ![数据手册](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614193542.png)
 
-*在STM32F10x参考手册中8.3.7定时器复用功能重映射可找到TIM2的复用影响,如下图所示*
+在STM32F10x参考手册中8.3.7定时器复用功能重映射可找到TIM2的复用影响,如下图所示
 
 ![参考手册](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614194006.png)
 
@@ -787,7 +784,7 @@ CNT与CCR寄存器的关系如下图所示
 
 高级定时器的前3个通道额外拥有死区生成和互补输出的功能,如下图所示
 
-![死区生成和互补输出功能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171832.png)   
+![死区生成和互补输出功能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613171832.png)
 
 ## PWM简介
 
@@ -797,7 +794,7 @@ PWM(Pulse Width Modulation)脉冲宽度调制
 
 ![PWM等效模拟](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613172702.png)
 
-*如上图所示,黑色的数字信号为实际信号,紫色的正弦波信号为通过PWM的等效出来的模拟信号*
+如上图所示,黑色的数字信号为实际信号,紫色的正弦波信号为通过PWM的等效出来的模拟信号
 
 PWM参数:
 
@@ -811,11 +808,11 @@ PWM参数:
 
 ![输出比较通道通用定时器](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613174155.png)
 
-*上图捕获/比较通道的输出部分在通用定时器框图中的对应关系如下图所示*
+上图捕获/比较通道的输出部分在通用定时器框图中的对应关系如下图所示
 
 ![在通用定时器框图中的对应关系](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613174726.png)
 
-*如上图所示,输入部分为CNT与CCR的比较结果,输出部分为TIMx_CH1~TIMx_CH4引脚的输出*
+如上图所示,输入部分为CNT与CCR的比较结果,输出部分为TIMx_CH1~TIMx_CH4引脚的输出
 
 ![流程分析](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613180753.png)
 
@@ -829,7 +826,7 @@ PWM参数:
 
 ![输出比较模式对应](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613181411.png)
 
-*如上图所示,输出比较模式对应该框图中输出模式控制器的执行逻辑*
+如上图所示,输出比较模式对应该框图中输出模式控制器的执行逻辑
 
 ![输出比较模式](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613181448.png)
 
@@ -844,23 +841,23 @@ PWM参数:
 1. 在1阶段时, CNT < CCR, REF置有效电平
 2. 在2阶段时, CNT >= CCR, REF置无效电平
 
-*如上图所示, 通过调节CCR的值即可调节PWM波的占空比*
+如上图所示, 通过调节CCR的值即可调节PWM波的占空比
 
 ### PWM的参数计算
 
 ![PWM的参数计算](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613191338.png)
 
-*如上图所示,PWM的频率 = 计数器的更新频率*
+如上图所示,PWM的频率 = 计数器的更新频率
 
 ## 输出比较通道(高级定时器)
 
 ![输出比较通道(高级定时器)](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613192252.png)
 
-*如上图所示,高级定时器的输出比较通道与通用定时器的输出比较通道的区别在于,高级定时器的输出比较通道有死区生成和互补输出的功能, 即上图中红框部分*
+如上图所示,高级定时器的输出比较通道与通用定时器的输出比较通道的区别在于,高级定时器的输出比较通道有死区生成和互补输出的功能, 即上图中红框部分
 
 ![推挽电路](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250613193511.png)
 
-*高级定时器的输出比较电路的输出一般会接上图所示的推挽电路*
+高级定时器的输出比较电路的输出一般会接上图所示的推挽电路
 
 1. Q1导通,Q2断开,输出高电平
 2. Q1断开,Q2导通,输出低电平
@@ -879,7 +876,7 @@ PWM参数:
 
 在HARDWARE文件夹中添加`PWM.c`和`PWM.h`文件
 
-### 硬件连接
+### 硬件连接（PWM呼吸灯实验）
 
 TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器复用功能重映射**章节中查看,*如下图所示*
 

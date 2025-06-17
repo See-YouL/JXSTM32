@@ -10,6 +10,7 @@
 
 - 输出模式下可控制端口输出输出高低电平，用来驱动led，蜂鸣器，模拟通信协议输出时序等。
 - 输入模式下可读取端口的高低电平或电压值，用来读取案件输入，外接模块电平信号输入，ADC电压采集，模拟通信协议接收数据等。
+
 ### GPIO基本结构
 
 ![GPIO基本结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250415221259703.png)
