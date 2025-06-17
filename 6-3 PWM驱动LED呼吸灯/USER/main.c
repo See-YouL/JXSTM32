@@ -1,10 +1,7 @@
 /*
- * OLED7针SPI接线:
- * SCK 接 PG12
- * SDA 接 PD5
- * RES 接 PD4
- * DC 接 PD15
- * CS 接 PD1
+ * LED接线:
+ * 正极 -> PA0
+ * 负极 -> GND
  */
 
 #include "stm32f10x.h"
