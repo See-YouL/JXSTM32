@@ -2,9 +2,9 @@
  * OLED接线:
  * GND -> GND(需要与STM32的GND共地)
  * VDD -> 3.3V
- * SCK-> PG12
- * SDA-> PD5
- * RES-> PD4
+ * SCK -> PG12
+ * SDA -> PD5
+ * RES -> PD4
  * DC -> PD15
  * CS -> PD1
  * 
@@ -47,9 +47,9 @@ int main(void)
             {
                 Angle = 0;
             }
-        Servo_SetAngle(Angle); // 设置舵机角度
-        OLED_ShowNum(41, 11, Angle, 3, 12); // 在(41, 11)位置显示当前角度, 字体大小12
-        OLED_Refresh(); // 更新显存到OLED
+            Servo_SetAngle(Angle); // 设置舵机角度
+            OLED_ShowNum(41, 11, Angle, 3, 12); // 在(41, 11)位置显示当前角度, 字体大小12
+            OLED_Refresh(); // 更新显存到OLED
         }
 	}
 }
