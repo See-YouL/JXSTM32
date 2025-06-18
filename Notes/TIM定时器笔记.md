@@ -882,7 +882,7 @@ TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器�
 
 ![TIM2_CH1的复用功能重映射](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614195759.png)
 
-- LED的正极 -> TIM2_CH1引脚(PA0)
+- LED的正极 -> TIM2_CH1_ETR引脚(PA0)
 - 负极 -> GND
 
 ### 常用库函数(PWM驱动部分)
@@ -1119,4 +1119,91 @@ int main(void)
         }
 	}
 }
+```
+
+### 引脚重映射(TIM2_CH1_ETR)
+
+硬件连接需要将LED正极连接到PA15引脚
+
+![引脚重映射TIM2_CH1_ETR](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618154154.png)
+
+如图所示,TIM2_CH1_ETR引脚可以重映射到PA15引脚上
+
+使用AFIO需要开启AFIO时钟,在`PWM_Init`函数中添加
+
+```c
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); // 开启AFIO时钟
+```
+
+需要用GPIO_PinRemapConfig函数来配置引脚重映射,在`PWM_Init`函数中添加
+
+```c
+GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE); // 部分重映射TIM2到PA15
+```
+
+GPIO_PinRemapConfig函数的第一个参数来确定重映射的类型
+
+```c
+/**
+  *     @arg GPIO_PartialRemap1_TIM2     : TIM2 Partial1 Alternate Function mapping
+  *     @arg GPIO_PartialRemap2_TIM2     : TIM2 Partial2 Alternate Function mapping
+  *     @arg GPIO_FullRemap_TIM2         : TIM2 Full Alternate Function mapping
+  **/
+```
+
+| 重映射类型 | 对应参数 |
+| - | - |
+| TIM2_REMAP[1:0] = 01 | GPIO_PartialRemap1_TIM2 |
+| TIM2_REMAP[1:0] = 10 | GPIO_PartialRemap2_TIM2 |
+| TIM2_REMAP[1:0] = 11 | GPIO_FullRemap_TIM2 |
+
+上表对应下图
+
+![重映射类型](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618160226.png)
+
+PA15引脚默认复用功能为JTDI调试引脚, 如下图所示
+
+![PA15引脚默认复用功能](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618160501.png)
+
+需要关闭PA15引脚的调试功能,在`PWM_Init`函数中添加
+
+```c
+GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // 禁用JTAG功能
+```
+
+解除PA15, PB3, PB4的JTAG复用功能, 使能SWD调试功能, 这样就可以将PA15引脚作为TIM2_CH1_ETR引脚使用了
+
+其他关于调试功能默认复用的参数,在`stm32f10x_gpio.h`文件中可以找到,如下所示
+
+```c
+/**
+  *     @arg GPIO_Remap_SWJ_NoJTRST      : Full SWJ Enabled (JTAG-DP + SW-DP) but without JTRST
+  *     @arg GPIO_Remap_SWJ_JTAGDisable  : JTAG-DP Disabled and SW-DP Enabled
+  *     @arg GPIO_Remap_SWJ_Disable      : Full SWJ Disabled (JTAG-DP + SW-DP)
+  **/
+```
+
+| 重映射端口 | 对应参数 |
+| - | - |
+| PB4 | GPIO_Remap_SWJ_NoJTRST |
+| PA15, PB3, PB4 | GPIO_Remap_SWJ_JTAGDisable |
+| PA13, PA14, PA15, PB3, PB4 | GPIO_Remap_SWJ_Disable |
+
+上表对应下图
+
+![端口类型](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618161752.png)
+
+关于调试端口映像和IO引脚分配可以在STM32F10x参考手册中找到,如下图所示
+
+![调试端口映像](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618162404.png)
+
+还需要在`PWM_Init`函数中配置PA15引脚为TIM2_CH1_ETR的复用推挽输出模式,如下所示
+
+```c
+GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // 选择PA0引脚, TIM2_CH1默认映射到PA0
+GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15; // 选择PA15引脚, TIM2_CH1_ETR重映射到PA15
+GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
+GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
 ```

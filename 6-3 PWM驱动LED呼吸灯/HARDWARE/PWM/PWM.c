@@ -4,12 +4,21 @@
 
 void PWM_Init(void)
 {
-    // 1. 开启时钟, 打开TIM2外设和GPIO外设的时钟
+    // 1. 开启时钟, 打开TIM2外设, GPIO外设和AFIO的时钟
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); // 开启AFIO时钟, 复用功能需要
+
+    /*    // 如果需要将TIM2_CH1_ETR重映射到PA15, 需要进行以下配置
+    // TIM2_CH1_ETR重映射到PA15
+    GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE); // 部分重映射TIM2_CH1_ETR到PA15
+
+    // 解除PA15的默认调试复用功能
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // 禁用JTAG, 只保留SWD功能
 
     // 2. 选择时基单元时钟源(默认使用内部时钟)
     TIM_InternalClockConfig(TIM2); // 选择内部时钟
+    */
 
     // 3. 配置时基单元
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
@@ -31,7 +40,10 @@ void PWM_Init(void)
 
     // 5. 配置PWM对应的GPIO
     GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // 选择PA0引脚
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; // 选择PA0引脚, TIM2_CH1默认映射到PA0
+    /*    // 如果需要将TIM2_CH1_ETR重映射到PA15, 则使用以下配置
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15; // 选择PA15引脚, TIM2_CH1_ETR重映射到PA15
+    */
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
     GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
