@@ -885,7 +885,7 @@ TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器�
 - LED的正极 -> TIM2_CH1_ETR引脚(PA0)
 - 负极 -> GND
 
-### 常用库函数(PWM驱动部分)
+### 常用库函数(PWM驱动LED呼吸灯实验)
 
 在`stm32f10x_tim.h`文件中常用的库函数
 
@@ -983,7 +983,7 @@ void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
 
 仅高级定时器使用,在使用高级定时器输出PWM时需要调用该函数使能主输出,否则无法输出PWM波形
 
-### PWM初始化函数
+### PWM初始化函数(PWM驱动LED呼吸灯实验)
 
 TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器复用功能重映射**章节中查看,*如下图所示*
 
@@ -1206,4 +1206,170 @@ GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15; // 选择PA15引脚, TIM2_CH1_ETR重�
 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
 GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
 GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+```
+
+## PWM驱动舵机实验
+
+工程文件目录: `6-4 PWM驱动舵机`
+
+实验目标: **实现按键按下增加舵机角度并在OLED显示当前角度**
+
+### 硬件连接(PWM驱动舵机实验)
+
+舵机型号为SG90 9G
+
+[舵机资料](https://telesky.yuque.com/bdys8w/01/tq7mgxs352qi0kkb)
+
+使用TIM2_CH2引脚来输出PWM波, TIM2_CH2默认复用为PA1引脚, 如下图所示
+
+![TIM2_CH2默认复用](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618182038.png)
+
+舵机接线:
+
+- VCC(舵机红色线) -> +5V
+- GND(舵机棕色线) -> GND(需要与STM32的GND共地)
+- PWM(舵机黄色线) -> TIM2_CH2引脚(PA1)
+
+OLED型号为0.96寸7针SPI
+
+[OLED资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+OLED接线:
+
+- GND -> GND(需要与STM32的GND共地)
+- VDD -> 3.3V
+- SCK-> PG12
+- SDA-> PD5
+- RES-> PD4
+- DC -> PD15
+- CS -> PD1
+
+按键使用霸道开发板按键(PA0),如下图所示
+
+![按键](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618202248.png)
+
+### PWM初始化函数(PWM驱动舵机)
+
+修改`PWM_Init`函数,将PA1引脚设置为TIM2_CH2的复用推挽输出模式
+
+```c
+GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; // 选择PA1引脚, TIM2_CH2默认映射到PA1
+```
+
+修改`PWM_Init`函数,将TIM2_CH2的输出比较通道配置为PWM2模式
+
+```c
+TIM_OC2Init(TIM2, &TIM_OCInitStructure); // 配置TIM2通道2的输出比较
+```
+
+也可使用不同通道一起初始化
+
+```c
+TIM_OC1Init(TIM2, &TIM_OCInitStructure); // 配置TIM2通道1的输出比较
+TIM_OC2Init(TIM2, &TIM_OCInitStructure); // 配置TIM2通道2的输出比较
+TIM_OC3Init(TIM2, &TIM_OCInitStructure); // 配置TIM2通道3的输出比较
+TIM_OC4Init(TIM2, &TIM_OCInitStructure); // 配置TIM2通道4的输出比较
+```
+
+对于同一个定时器的不同通道输出的PWM波
+
+1. 不同通道共用一个计数器, 频率一样
+2. 占空比由各自的CCR决定, 可以各自设定
+3. 由于计数器更新, 所有PWM同时跳变, 相位一致
+
+如果驱动多个舵机或者直流电机, 使用一个定时器不同通道的PWM波形, 可以节省资源, 只需要一个计数器就可以了
+
+新增`PWM_SetCompare2`函数, 用来设置TIM2_CH2的比较值
+
+```c
+void PWM_SetCompare2(uint16_t Compare)
+{
+    TIM_SetCompare2(TIM2, Compare); // 设置TIM2通道2的比较值
+}
+```
+
+参数计算:
+
+[参考舵机资料](https://telesky.yuque.com/bdys8w/01/tq7mgxs352qi0kkb)
+
+![频率](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618190139.png)
+
+1. 舵机的工作频率为50Hz, 即20ms一个周期
+2. 舵机高电平时长0.5ms到2.5ms, 占空比大致为2.5%到12.5%
+
+根据公式可列出如下关系
+
+- 50Hz = 72MHz / (PSC + 1) / (ARR + 1)
+- 2.5%~12.5% = CCR / (ARR + 1)
+
+可以取ARR + 1 = 20K, PSC + 1 = 72, CCR = 500~2500
+
+1. ARR + 1 = 20000
+2. PSC + 1 = 72
+3. CCR = 500 ~ 2500 对应占空比 2.5% ~ 12.5%
+
+对应进行参数修改
+
+```c
+TIM_TimeBaseInitStructure.TIM_Period = 20000 - 1; // ARR + 1 = 20K
+TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1; // PSC + 1 = 72
+TIM_OCInitStructure.TIM_Pulse = 500; // CCR = 500
+```
+
+### 舵机角度函数
+
+新建`servo.c`和`servo.h`文件, 封装舵机角度函数
+
+在`servo.c`文件中实现舵机角度函数
+
+```c
+void Servo_SetAngle(float angle)
+{
+    if (angle > 180) // 限制角度在0~180度之间
+    {
+        angle = 180;
+    }
+    
+    // 将角度转换为对应的CCR值
+    // 0度对应500, 180度对应2500
+    uint16_t ccr_value = 500 + (angle * (2500 - 500)) / 180; // 线性映射
+    PWM_SetCompare2(ccr_value); // 设置TIM2_CH2的比较值
+}
+```
+
+### 实现按键增加舵机角度并在OLED显示当前角度
+
+在`main.c`文件中实现按键增加舵机角度并在OLED显示当前角度
+
+```c
+uint8_t KeyNum; // 接收键码的变量
+float Angle; // 舵机角度变量
+
+int main(void)
+{
+	delay_init(); // 延时初始化
+	OLED_Init(); // OLED初始化
+    Servo_Init(); // 舵机初始化
+	
+	OLED_Clear(); // OLED清屏
+	OLED_ShowString(1, 11, "Angle:", 12); // 在(1, 11)位置显示"Angle:"字体大小12
+	OLED_Refresh(); // 更新显存到OLED
+
+	while(1)
+	{
+        KeyNum = KEY_GetNum(); // 获取按键值
+        if (KeyNum == 1) // 按键按下
+        {
+            Angle += 10; // 每次按下增加10度
+            if (Angle > 180) // 限制角度在0~180度之间
+            {
+                Angle = 0;
+            }
+        Servo_SetAngle(Angle); // 设置舵机角度
+        OLED_ShowNum(41, 11, Angle, 3, 12); // 在(41, 11)位置显示当前角度, 字体大小12
+        OLED_Refresh(); // 更新显存到OLED
+        }
+	}
+}
+
 ```
