@@ -1373,3 +1373,176 @@ int main(void)
 }
 
 ```
+
+## PWM驱动直流电机实验
+
+工程文件目录: `6-5 PWM驱动直流电机`
+
+实验目标: **实现按键控制直流电机转速并在OLED显示当前速度**
+
+### 硬件连接
+
+直流电机型号为**130小马达电动机**
+
+[130小马达电动机淘宝链接](https//detail.tmall.com/item.htm?id=41310780866&spm=tbpc.boughtlist.suborder_itempic.d41310780866.1d292e8d0WBHOm)
+
+电机驱动板型号为**TB6612FNG**
+
+[TB6612FNG电机驱动板资料](https://telesky.yuque.com/bdys8w/01/tuogxw59rm1v97bc)
+
+130电机和TB6612FNG电机驱动板连线如下:
+
+- VM -> 5V
+- VCC -> 3.3V
+- GND -> GND(需要与STM32的GND共地)
+- AO1 -> 电机端口1
+- AO2 -> 电机端口2(不分正反)
+- PWMA -> TIM2_CH3引脚(PA2)
+- AIN2 -> PA5
+- AIN1 -> PA4
+- STBY -> 3.3V
+
+OLED型号为0.96寸7针SPI
+
+[OLED资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+OLED接线:
+
+- GND -> GND(需要与STM32的GND共地)
+- VDD -> 3.3V
+- SCK -> PG12
+- SDA -> PD5
+- RES -> PD4
+- DC -> PD15
+- CS -> PD1
+
+按键使用霸道开发板按键(PA0),如下图所示
+
+![按键](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250618202248.png)
+
+### PWM初始化函数(PWM驱动直流电机)
+
+```c
+// 初始化 TIM2_CH3(PA2)为PWM输出
+void PWM_Init(void)
+{
+    // 1. 开启时钟, 打开TIM2外设, GPIO外设和AFIO的时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); // 开启TIM2时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); // 开启AFIO时钟, 复用功能需要
+
+    // 2. 选择时基单元时钟源(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM2); // 选择内部时钟
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 100 - 1; // ARR + 1 = 100  
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 36 - 1; // PSC + 1 = 36
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 时钟分频系数, 不分频
+    TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure); // 初始化TIM2时基单元
+
+    // 4. 配置输出比较通道
+    TIM_OCInitTypeDef TIM_OCInitStructure; // 定义输出比较结构体
+    TIM_OCStructInit(&TIM_OCInitStructure); // 初始化输出比较结构体
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; // 设置输出比较模式为PWM1
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // 设置输出极性为高
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; // 使能输出比较
+    TIM_OCInitStructure.TIM_Pulse = 50; // CCR = 50
+    TIM_OC3Init(TIM2, &TIM_OCInitStructure); // 初始化TIM2通道3的输出比较
+
+    // 5. 配置PWM对应的GPIO
+    GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2; // 选择PA2引脚, TIM2_CH3默认映射到PA2
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 设置为复用推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+
+    // 6. 运行控制,启动计数器
+    TIM_Cmd(TIM2, ENABLE); // 使能TIM2计数器
+
+}
+```
+
+### 直流电机初始化函数
+
+```c
+// 初始化PWM(TIM2_CH3)为PA4, PA5控制电机方向和速度
+void Motor_Init(void) 
+{
+    // 初始化PA4, PA5进行电机方向控制
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; // 设置为推挽输出
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5; // 选择PA4,PA5引脚
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+
+    // 初始化PWM(TIM2_CH3)
+    PWM_Init(); 
+
+}
+```
+
+### 直流电机控制函数
+
+```c
+// 设置电机速度和方向
+void Motor_SetSpeed(int8_t Speed)
+{
+    if (Speed >= 0)
+    {
+        // 正转
+        GPIO_SetBits(GPIOA, GPIO_Pin_4); // 设置PA4为高电平
+        GPIO_ResetBits(GPIOA, GPIO_Pin_5); // 设置PA5为低电平
+        PWM_SetCompare3(Speed); // 设置PWM占空比
+    } 
+    else 
+    {
+        // 反转
+        GPIO_ResetBits(GPIOA, GPIO_Pin_4); // 设置PA4为低电平
+        GPIO_SetBits(GPIOA, GPIO_Pin_5); // 设置PA5为高电平
+        PWM_SetCompare3(-Speed); // 设置PWM占空比(取绝对值)
+    }
+}
+```
+
+### 实现按键控制直流电机速度并在OLED显示当前速度
+
+```c
+uint8_t KeyNum; // 按键编号变量
+int8_t Speed; // 电机速度变量
+
+int main(void)
+{
+	delay_init(); // 延时初始化
+    OLED_Init(); // OLED初始化
+    Motor_Init(); // 电机初始化
+
+	OLED_Clear(); // OLED清屏
+	OLED_ShowString(1, 11, "Speed:", 12); // 在(1, 11)位置显示"Speed:"字体大小12
+	OLED_Refresh(); // 更新显存到OLED
+
+    Motor_SetSpeed(0); // 设置电机初始速度为0
+
+	while(1)
+	{
+        KeyNum = KEY_GetNum(); // 获取按键编号
+        if (KeyNum == 1) // 按键按下
+        {
+            Speed += 20; // 增加速度
+            if (Speed > 100) // 限制最大速度为100
+            {
+                Speed = -100;
+            }
+            Motor_SetSpeed(Speed); // 设置电机速度
+            OLED_ShowNum(41, 11, Speed, 3, 12); // 显示负数时有BUG
+            OLED_Refresh(); // 更新显存到OLED
+        }
+	}
+}
+
+```
