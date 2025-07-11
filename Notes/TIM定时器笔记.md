@@ -47,6 +47,9 @@ PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内
 输入捕获测频率/PWMI模式测频率占空比包含如下内容
 
 - 输入捕获实验
+- PWMI模式测频率占空比实验
+
+[定时器编码器接口部分理论知识视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=19&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 
 ## TIM 定时器简介
 
@@ -1914,7 +1917,7 @@ uint32_t IC_GetFreq(void)
 
 仅为美化数据
 
-## PWMI模式测频率占空比
+## PWMI模式测频率占空比实验
 
 工程文件目录: `6-7 PWMI模式测频率占空比`
 
