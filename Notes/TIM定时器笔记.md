@@ -40,6 +40,14 @@ PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内
 
 定时器输入捕获包含如下内容
 
+- TIM输入捕获
+
+[输入捕获测频率/PWMI模式测频率占空比](https://www.bilibili.com/video/BV1th411z7sn/?p=18&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+输入捕获测频率/PWMI模式测频率占空比包含如下内容
+
+- 输入捕获实验
+
 ## TIM 定时器简介
 
 定时器可以对输入的时钟进行计数,并在计数值达到设定值时触发中断.
