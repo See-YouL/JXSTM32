@@ -1675,3 +1675,209 @@ TI1FP1配置上升沿触发,触发捕获和清零CNT,TI1FP2配置下降沿触发
 3. 下一次上升沿CCR1捕获,CNT清零
 
 此时,CCR2的值为高电平时的计数值,CCR1的值为一整个周期的计数值,CCR2/CCR1即为占空比
+
+## 输入捕获实验
+
+工程文件目录: `6-6 输入捕获模式测频率`
+
+实验目标: **实现显示测周法频率**
+
+### 硬件连接(输入捕获实验)
+
+PWM接线:
+
+PWM信号由PA0产生,PA6进行输入捕获的接收,接线如下所示
+
+- PA6 -> PA0
+- PA0 -> PA6
+
+OLED接线:
+
+- GND -> GND(需要与STM32的GND共地)
+- VDD -> 3.3V
+- SCK -> PG12
+- SDA -> PD5
+- RES -> PD4
+- DC -> PD15
+- CS -> PD1
+
+### 设置PWM波形的频率
+
+频率计算公式为 Freq = 72MHz / (PSC + 1) / (ARR + 1)
+
+通过固定(ARR+1)的值为100,则只需要修改PSC的值即可更改频率
+
+在`PWM.c`中增加`PWM_SetPrescaler`函数用来单独修改PSC的值
+
+```c
+// 单独写入PSC
+void PWM_SetPrescaler(uint16_t Prescaler)
+{
+    TIM_PrescalerConfig(TIM2, Prescaler, TIM_PSCReloadMode_Immediate); // 设置TIM2的PSC的值
+}
+```
+
+### 输入捕获初始化函数
+
+在`stm32f10x_tim.h`中找到关于输入捕获的函数,如下所示
+
+```c
+// 用结构体配置输入捕获单元的函数
+void TIM_ICInit(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct);
+
+// 用结构体配置时基单元的函数,可快速配置两个通道,配置为PWMI模式
+void TIM_PWMIConfig(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct);
+
+// 给输入捕获结构体赋初值的函数
+void TIM_ICStyyuctInit(TIM_ICInitTypeDef* TIM_ICInitStruct);
+
+// 选择从模式触发源的函数
+void TIM_SelectInputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource);
+
+// 选择主模式输出触发源的函数
+void TIM_SelectOutputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_TRGOSource);
+
+// 选择从模式
+void TIM_SelectSlaveMode(TIM_TypeDef* TIMx, uint16_t TIM_SlaveMode);
+
+// 分别单独配置通道1234的分频器 
+void TIM_SetIC1Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC2Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC3Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+void TIM_SetIC4Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
+
+// 分别读取四个通道的CCR,输入捕获模式下CCR只读
+uint16_t TIM_GetCapture1(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture2(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture3(TIM_TypeDef* TIMx);
+uint16_t TIM_GetCapture4(TIM_TypeDef* TIMx);
+
+// 分别写入四个通道的CCR,输出比较模式下CCR只写
+void TIM_SetCompare1(TIM_TypeDef* TIMx, uint16_t Compare1);
+void TIM_SetCompare2(TIM_TypeDef* TIMx, uint16_t Compare2);
+void TIM_SetCompare3(TIM_TypeDef* TIMx, uint16_t Compare3);
+void TIM_SetCompare4(TIM_TypeDef* TIMx, uint16_t Compare4);
+```
+
+![输入捕获流程图](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250711214900.png)
+
+如上图输入捕获结构图所示,流程如下:
+
+1. 开启时钟,打开GPIO和TIM的时钟
+2. GPIO初始化,把GPIO配置成输入模式,一般选择上拉输入/浮空输入
+3. 配置时基单元,让CNT计数器在内部时钟的驱动下自增运行
+4. 配置输入捕获单元,包括滤波器,极性,直连/交叉通道,分频器
+5. 选择从模式的触发源,选择为TI1FP1
+6. 选择触发后执行的操作,从模式选择Reset操作
+7. 调用TIM_Cmd函数,开启定时器
+
+在`IC.c`中增加`IC_Init`函数, 用于初始化输入捕获
+
+```c
+void IC_Init(void)
+{
+    // 1. 开启时钟, 打开TIM3外设, GPIO外设的时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); // 开启TIM3时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+
+
+    // 2. 配置PWM对应的GPIO
+    GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6; // 选择PA6引脚, TIM3_CH1默认映射到PA6
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; // 设置为上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+
+    // 3. 选择时基单元时钟源(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM3); // 选择内部时钟
+
+    // 4. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 65536 - 1; // 为了防止溢出,ARR的值设置最大值 
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1; // 标准频率为72M/72=1MHz
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure); // 初始化TIM3时基单元
+
+    // 5. 初始化输入捕获单元
+    TIM_ICInitTypeDef TIM_ICInitStructure; // 定义输入捕获初始化结构体
+    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1; // 选择通道1
+    TIM_ICInitSturcture.TIM_ICFilter = 0xF; // 设置滤波器参数, 0xF为最大值
+    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 设置极性为上升沿触发
+    TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1; // 设置分频器为不分频
+    TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; // 选择直连通道
+    TIM_ICInit(TIM3, &TIM_ICInitStructure); // 配置TIM3的输入捕获
+
+    // 6. 配置TRGI的触发源为TI1FP1
+    TIM_SelectInputTrigger(TIM3, TIM_TS_TI1FP1); // 选择触发源为TI1FP1
+
+    // 7. 配置从模式为Reset
+    TIM_SelectSlaveMode(TIM3, TIM_SlaveMode_Reset); // 设置从模式为复位模式
+
+    // 8. 启动定时器
+    TIM_Cmd(TIM3, ENABLE); // 使能TIM3定时器
+}
+```
+
+### 测周法频率读取函数
+
+测周法的标准频率 $f_c = 72MHz / (PSC+1) = 72MHz/(72-1+1) = 1MHz$
+
+测周法测得的频率为 $f_x = f_c / N = 1MHz / N$ ,其中N为CRR的计数值
+
+在`IC.c`中增加`IC_GetFreq`函数, 用于读取测周法的频率
+
+```c
+uint32_t IC_GetFreq(void)
+{
+    /*
+     * Fc = 72MHz/(PSC+1) = 72MHz/(72-1+1) = 1MHz
+     * Fx = Fc/N = 1MHz / N
+     */
+    return 1000000 / (TIM_GetCapture1(TIM3)); // 返回频率Fx
+}
+```
+
+### 实现显示测周法频率
+
+```c
+int main(void)
+{
+	delay_init(); // 延时函数初始化
+    PWM_Init(); // TIM2的PWM初始化
+    IC_Init(); // 输入捕获初始化
+    OLED_Init(); // OLED初始化
+    
+	OLED_Clear(); // OLED清屏
+	OLED_ShowString(1, 11, "Freq::", 12); // 在(1, 11)位置显示"Freq:"字体大小12
+	OLED_Refresh(); // 更新显存到OLED
+
+    PWM_SetCompare1(720-1); // 设置PSC, PWM频率为72M/720/100 = 1KHz
+    PWM_SetCompare1(50); // 设置CCR, PWM占空比为50%
+
+	while(1)
+	{
+        OLED_ShowNum(1, 31, IC_GetFreq(), 5, 12); // 显示频率
+        OLED_Refresh(); // 更新显存到OLED
+	}
+}
+```
+
+### BUG解决(输入捕获实验)
+
+实际测试中,测出的频率会比实际频率+1,在`IC_GetFreq`函数中修改
+
+```c
+// 返回测周法测出的频率
+uint32_t IC_GetFreq(void)
+{
+    /*
+     * Fc = 72MHz/(PSC+1) = 72MHz/(72-1+1) = 1MHz
+     * Fx = Fc/N = 1MHz / N
+     */
+    return 1000000 / (TIM_GetCapture1(TIM3) + 1); // 返回频率Fx
+}
+```
+
+仅为美化数据
