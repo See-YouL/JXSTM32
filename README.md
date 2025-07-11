@@ -1,7 +1,7 @@
 # JXSTM32
 
-江协科技STM32教程
+江协科技STM32教程说明
 
-- [B站江协科技视频链接](https://www.bilibili.com/video/BV1th411z7sn/?share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+- 参照江协科技STM32视频[B站江协科技视频链接](https://www.bilibili.com/video/BV1th411z7sn/?share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
 - 笔记文件存放在Notes文件夹下
-- 开发板使用野火霸道V2
+- 开发板使用野火霸道V2,下载器为野火高速版DAP下载器,[野火购买链接](https://detail.tmall.com/item.htm?id=600354493045&pisk=gBCasBOIf5FwVzx9I6OqY462EdA93Ir7mstXoZbD5hxgHFNmgZ7klPEYW98ccMUYWC_D0iSBvjTbBohVYG_lCdsfCnYDxMbs1nN93i752iGb6OTmgM_vni1Vkj8coiU9cPeCWNdviuZ507_OWP-HkC5wmwxhJEiiIJ9iQW7_RuZ7NSyi-IraVi91ILVHzUADSKcixy8yoAADnFb38EYjjxcGmyzelUMijncmt2Y2uIDDiIxntULoSfADmX4ekHDDiIjDKy8xtXQGoX8WIrFX2ZNxIgJwqNxEawCWSbKzwHGcg6YMQsbBYw_CTFJwqKfUpG1GAZf16peoUIQCUiWcxWlN0NXlmh13qj-fe1Qh9d3raCsOKBfGUqcc8C-BnsvEbk-l6wfJtpNuzwfdfNCFlqVDRgthW1A4ZzdwshAeJsZKsnWhn199Mcqwiw8c4Xiv-oMfMOom3dYp83aU8IOP0TogE64ZHxpHwe-75FMxHdYKGA5raxHvKULeVPT1.&skuId=4386534710803&spm=tbpc.boughtlist.suborder_itempic.d600354493045.12852e8dOh0AD5)
