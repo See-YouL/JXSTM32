@@ -1916,11 +1916,38 @@ uint32_t IC_GetFreq(void)
 
 ## PWMI模式测频率占空比
 
+工程文件目录: `6-7 PWMI模式测频率占空比`
+
+实验目标: **实现PWMI模式测量频率和占空比并在OLED显示**
+
+### 硬件连接(PWMI模式测频率和占空比)
+
+PWM接线:
+
+PWM信号由PA0产生,PA6进行输入捕获的接收,接线如下所示
+
+- PA6 -> PA0
+- PA0 -> PA6
+
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
+
+OLED接线:
+
+- GND -> GND(需要与STM32的GND共地)
+- VDD -> 3.3V
+- SCK -> PG12
+- SDA -> PD5
+- RES -> PD4
+- DC -> PD15
+- CS -> PD1
+
+### PWMI初始化函数
+
 ![PWMI基本结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250711235449.png)
 
 PWMI流程图如上所示
-
-### PWMI初始化函数
 
 在`IC.c`中`IC_Init`函数里使用`TIM_PWMIConfig`函数进行PWMI配置
 
