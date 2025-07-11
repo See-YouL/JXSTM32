@@ -40,7 +40,7 @@ int main(void)
     OLED_ShowString(61, 11, "Hz", 12); // 在(32, 11)位置显示"Hz"字体大小12
 	OLED_Refresh(); // 更新显存到OLED
 
-    PWM_SetCompare1(720-1); // 设置PSC, PWM频率为72M/720/100 = 1KHz
+    PWM_SetPrescaler(720-1); // 设置PSC, PWM频率为72M/720/100 = 1KHz
     PWM_SetCompare1(50); // 设置CCR, PWM占空比为50%
 
 	while(1)
