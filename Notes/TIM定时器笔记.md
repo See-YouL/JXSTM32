@@ -340,6 +340,10 @@ CSS: Clock Security System,时钟安全系统,可以监测外部时钟的运行�
 
 ### 硬件连接（定时中断实验）
 
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
+
 OLED连接
 
 - SCK 接 PG12
@@ -627,6 +631,10 @@ void Timer_Init(void)
 
 ### 硬件连接（外部时钟实验）
 
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
+
 OLED连接
 
 - SCK 接 PG12
@@ -634,6 +642,10 @@ OLED连接
 - RES 接 PD4
 - DC 接 PD15
 - CS 接 PD1
+
+[火焰传感器3针资料](https://telesky.yuque.com/bdys8w/01/qyw1o22t6g5e278p)
+
+[火焰传感器3针购买链接](https://detail.tmall.com/item.htm?id=16492681878&pisk=g9s06ljbiZ8XW6PJygtb8xBMLUU8Dnt1b1n96hdazQR7Cq3YhFJNI1jOkOR9j1fGsILaGnIGZ96ThGeX0lvN9_xOHIdOZRfACcFb5nnZss6UGtdThGAwZs5M5-O9_CfOQZe8vkBfhhtwjWELvyylSn1mbFRaQQJeQ8p4FZrN8hta950-bEZHfsJvulmZzLRWIdlq01orzdAyQq-N_Q8yLph2b15w44Jpdclw3c8y4Q9i7cu274kyBKlq_1-aETRWQhJN_hlFccRhbgszwfO-D4Wrut9DoBW2gtQR458nlTOkhKIynTxC3ViZbgvDog8VBpvwkNWBRiB0j0tAKa-yn1rUg3WFr9LcmWmv1ssM5gLqQJT5UdYebUDZbTxJZUS2YklkFaWA7i1mIcJfDMLMOU2ZfFKPve7FiAwCUnJN1esTOmOVQ9sCJHqi4nYN413r8kijfLyO4Vg6uL9k93yRkgmuq0u_E80QlEJWHWeuEVgsOco3982oRjT2FKFd.&spm=tbpc.boughtlist.suborder_itempic.d16492681878.12852e8dOh0AD5)
 
 火焰传感器连接
 
@@ -895,6 +907,10 @@ PWM参数:
 TIM2_CHx的复用功能重映射可在STM32F10x参考手册的**8.3.7定时器复用功能重映射**章节中查看,*如下图所示*
 
 ![TIM2_CH1的复用功能重映射](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250614195759.png)
+
+[三色LED模块购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247698256_554130571_0&bxsign=tbkP7-hJm4UxHApHSTyxzoEhnh5jJpeZkkIGfhrRLEDYcb7cAMrnSTAQxTaipPF6iYeAysW6ucwiltB_wo_1vRuJsJyd5hcCoyPvmp7s1tzBCIDz2_n6SUJXsmP3tg48GC-yzjacDIYPZeX-lbqKmkrO9cgaskmmgQiCCwDLnTgAchg4crSVOvcmgonZ-7QdvZL&id=673190083230&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247696%40213c9516_1ce0_197fa19fda9_88c8%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A554130571_0%401752247698260)
+
+LED连接:
 
 - LED的正极 -> TIM2_CH1_ETR引脚(PA0)
 - 负极 -> GND
@@ -1230,9 +1246,11 @@ GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
 
 ### 硬件连接(PWM驱动舵机实验)
 
-舵机型号为SG90 9G
+舵机型号为SG90 9G 90度-180度通用
 
 [舵机资料](https://telesky.yuque.com/bdys8w/01/tq7mgxs352qi0kkb)
+
+[SG90舵机购买链接](https://detail.tmall.com/item.htm?id=41248626148&pisk=glQg6fb_IG-_oSwpvwT_4fCDaHEdtFTfut3vHEp4YpJQGcnT1nRVitbAXsJvotXcndK4CFQcK_1Y1ZF67rAVe9YA6dpAKSXOGqe_cF3qnO1zC1pY1Zv2KOWDc59v3KXAgGFLyzC11ET2o8U8yuPhmF6iuh-4gHRJaWdaOGzV4ET4e-mKuhaklOR9bg3qYBJBiIkZ7tkELIvegc8V3p-eaQHwutW28DRJNqk2_q-e8pOy_IJquD-eZI0q3t84tHJBgERV3EleCqJluw_Upx9KWD8r4eOMjL5wQ1QN8PTZfs9hZ_7es6Yc_mgquwAMjw-NMQA2Xi5WVNCgo2TOZM8estzzQe5Px_KGS809hO_DcwKZg7tCTIxyuHcqu6YpKH7wzzkHOM5O0N6iiqR1WaKDFHVqlnLFy3SPIjN5TFRVh3_YFV9Ng__52U4m8FxV4PnE4zgslBPA8miXbBOHeePdXw03-2obtWm7fhRB68F3tmijFquueWVnVAtwOCeR.&spm=tbpc.boughtlist.suborder_itempic.d41248626148.12852e8dOh0AD5)
 
 使用TIM2_CH2引脚来输出PWM波, TIM2_CH2默认复用为PA1引脚, 如下图所示
 
@@ -1244,9 +1262,9 @@ GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
 - GND(舵机棕色线) -> GND(需要与STM32的GND共地)
 - PWM(舵机黄色线) -> TIM2_CH2引脚(PA1)
 
-OLED型号为0.96寸7针SPI
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
 
-[OLED资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
 
 OLED接线:
 
@@ -1398,11 +1416,13 @@ int main(void)
 
 直流电机型号为**130小马达电动机**
 
-[130小马达电动机淘宝链接](https//detail.tmall.com/item.htm?id=41310780866&spm=tbpc.boughtlist.suborder_itempic.d41310780866.1d292e8d0WBHOm)
+[130小马达电动机淘宝链接](https://detail.tmall.com/item.htm?id=41310780866&pisk=gE_36hbQKM-Qnse9XNTQ0XCkghE9jeT5zT3JeUpzbdJ_NDnLO3RPZTbRv_JJrTXlEpKzdeQlIs18OaFB8zAPHOYR9ppRI7XdN4eQVe3rE914d6p8OavyI9WkVW9JULXRaMFTkrCCOUTyr-UYkoPGqe6nz3oUacR2t5dU1MzP0UTzH8mtzHaDP9Rp4T3rbCJ6ZQkE8TkZQQvwaD8PUd-wgIHezTWy7cRvG4kyT4-w7dO2T2-ezAlwNBor4T8zs1J6aURPUUlFS4JczN_aBY9tJc8EyEOHxK5eL6QF7fYKAsJG2g7wt1YlT0grzNAHxN-FwIAyvg5XcwC3rVTdiG8wtTz4LF5VjsKh--0pF9_kVNKEaSt1_Qx2zhcrz1Y9Ih7eurkM1G5d4w6nZ4RCJZKkhhVrP3LNknSVKbNf_eRPFn_8h29Fas_fDE4o7exP45nZ0rgIPCPR70iWYCOMHFPOvN0gSVo7s5mbAHR69-Fgs0iSh4u0H5Vicvte1BeA.&spm=tbpc.boughtlist.suborder_itempic.d41310780866.12852e8dOh0AD5)
 
 电机驱动板型号为**TB6612FNG**
 
 [TB6612FNG电机驱动板资料](https://telesky.yuque.com/bdys8w/01/tuogxw59rm1v97bc)
+
+[TB6612FNG电机驱动板购买链接](https://detail.tmall.com/item.htm?id=41248562401&pisk=grBa6zvI5ReN1bL9s99q8012ZCv9yKz7otTXmijDfFYgMhwm3iSkclUYX6-clwEYXdsDuZ7BJxtb6rHV8Nsl1C_f1ExD-wjsCEw9gZS5yZMbB1tm3wsviZ6VDx-cmZE9llFCXGpvnza5u8sOXl8HDdWwoB2hv3-MoWOi_JS_Aza7F-PixKzaPZO1mrmH43vDjIDi-k-k2nvDihj3YnxjSjDGokrec3GiSEDmKDx20KDDsIxnx3tWmxvDskSHJhvDoZA0YMcF0GjmL3OgD-TRc-3aUsTljekmU0p9scQEGvkENhdMrBvmnH6ebC8ljTzmvlxhd9RWOmaWKgCCSHJz3vvwa1bwxMUqUFf52gTD10MAYM6OusAUjRjeQFRAKQom_d5cWtRO_mERxdbdwUdg9yKFCTO2yBu3SMseSQ5V5yHD5_Sh8Q6IRY9hq6JF4DgvxrGfH1umgCxpYUZUYK9Pu_ugZ9qZMjdHeH87fhGxMCxKhfWrUjhvt3KePlt1.&spm=tbpc.boughtlist.suborder_itempic.d41248562401.12852e8dOh0AD5)
 
 130电机和TB6612FNG电机驱动板连线如下:
 
@@ -1416,11 +1436,11 @@ int main(void)
 - AIN1 -> PA4
 - STBY -> 3.3V
 
-OLED型号为0.96寸7针SPI
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
 
-[OLED资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
 
-OLED接线:
+OLED连接:
 
 - GND -> GND(需要与STM32的GND共地)
 - VDD -> 3.3V
@@ -1698,6 +1718,10 @@ PWM信号由PA0产生,PA6进行输入捕获的接收,接线如下所示
 
 - PA6 -> PA0
 - PA0 -> PA6
+
+[0.96寸7针OLED显示屏SPI接口资料](https://telesky.yuque.com/bdys8w/01/lw9nqcxkk0hffiuz)
+
+[0.96寸7针OLED显示屏SPI接口购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1752247506496_557215226_0&bxsign=tbktZejeaT6MloquHvxd6qDPk26u0_fjPoLk-l99lLIojBUzU6GXGDVZfwsz_JGquPlwm-NjAy1u24jEoHABX5P66pHeEPjvDCsKELgAQ7fYNjx7p00OOtOzTUosTBnTp6lWxpb8rQk1N_KNQ2EoAbk98Hib81l4Fw96H8mWDcuaI8MWbHM7Mx2K2vk5h4jE_5O&id=42044259331&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401752247504%4021508606_0db1_197fa170dde_b4fe%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557215226_0%401752247506499)
 
 OLED接线:
 
