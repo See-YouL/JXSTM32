@@ -1704,13 +1704,13 @@ TI1FP1配置上升沿触发,触发捕获和清零CNT,TI1FP2配置下降沿触发
 
 此时,CCR2的值为高电平时的计数值,CCR1的值为一整个周期的计数值,CCR2/CCR1即为占空比
 
-## 输入捕获实验
+## 输入捕获模式测频率实验
 
 工程文件目录: `6-6 输入捕获模式测频率`
 
 实验目标: **实现显示测周法频率**
 
-### 硬件连接(输入捕获实验)
+### 硬件连接(输入捕获模式测频率实验)
 
 PWM接线:
 
@@ -1913,3 +1913,140 @@ uint32_t IC_GetFreq(void)
 ```
 
 仅为美化数据
+
+## PWMI模式测频率占空比
+
+![PWMI基本结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250711235449.png)
+
+PWMI流程图如上所示
+
+### PWMI初始化函数
+
+在`IC.c`中`IC_Init`函数里使用`TIM_PWMIConfig`函数进行PWMI配置
+
+```c
+// 5. 初始化输入捕获单元
+TIM_ICInitTypeDef TIM_ICInitStructure; // 定义输入捕获初始化结构体
+TIM_ICInitStructure.TIM_Channel = TIM_Channel_1; // 选择通道1
+TIM_ICInitStructure.TIM_ICFilter = 0xF; // 设置滤波器参数, 0xF为最大值
+TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 设置极性为上升沿触发
+TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1; // 设置分频器为不分频
+TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; // 选择直连通道
+TIM_PWMIConfig(TIM3, &TIM_ICInitStructure); // 配置TIM3的输入捕获
+```
+
+上述代码等效于下面的代码,下面的代码为不使用`TIM_PWMIConfig`函数,手动配置通道2实现PWMI模式
+
+```c
+// 5. 初始化输入捕获单元
+TIM_ICInitTypeDef TIM_ICInitStructure; // 定义输入捕获初始化结构体
+TIM_ICInitStructure.TIM_Channel = TIM_Channel_1; // 选择通道1
+TIM_ICInitStructure.TIM_ICFilter = 0xF; // 设置滤波器参数, 0xF为最大值
+TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 设置极性为上升沿触发
+TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1; // 设置分频器为不分频
+TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; // 选择直连通道
+TIM_ICInit(TIM3, &TIM_ICInitStructure); // 配置TIM3的输入捕获
+TIM_ICInitStructure.TIM_Channel = TIM_Channel_2; // 选择通道2
+TIM_ICInitStructure.TIM_ICFilter = 0xF; // 设置滤波器参数, 0xF为最大值
+TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling; // 设置极性为下降沿触发
+TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1; // 设置分频器为不分频
+TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_IndirectTI; // 选择交叉通道
+TIM_ICInit(TIM3, &TIM_ICInitStructure); // 配置TIM3的输入捕获
+```
+
+可见,使用`TIM_PWMIConfig`函数可以简化PWMI模式的配置,只需要配置一次输入捕获结构体即可
+
+`TIM_PWMIConfig`函数仅支持通道1和通道2的配置
+
+PWMI模式的初始化函数与输入捕获模式的初始化函数类似,只需要在`IC_Init`函数中修改PWMI配置即可
+
+```c
+void IC_Init(void)
+{
+    // 1. 开启时钟, 打开TIM3外设, GPIO外设的时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); // 开启TIM3时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+
+
+    // 2. 配置PWM对应的GPIO
+    GPIO_InitTypeDef GPIO_InitStructure; // 定义GPIO初始化结构体
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6; // 选择PA6引脚, TIM3_CH1默认映射到PA6
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; // 设置为上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置GPIO速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure); // 初始化GPIOA
+
+    // 3. 选择时基单元时钟源(默认使用内部时钟)
+    TIM_InternalClockConfig(TIM3); // 选择内部时钟
+
+    // 4. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 滤波采样频率一分频
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
+	TIM_TimeBaseInitStructure.TIM_Period = 65536 - 1; // 为了防止溢出,ARR的值设置最大值 
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1; // 标准频率为72M/72=1MHz
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; // 重复计数器(高级定时器才有的),这里不用,赋值0
+    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure); // 初始化TIM3时基单元
+
+    // 5. 初始化输入捕获单元
+    TIM_ICInitTypeDef TIM_ICInitStructure; // 定义输入捕获初始化结构体
+    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1; // 选择通道1
+    TIM_ICInitStructure.TIM_ICFilter = 0xF; // 设置滤波器参数, 0xF为最大值
+    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 设置极性为上升沿触发
+    TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1; // 设置分频器为不分频
+    TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; // 选择直连通道
+    TIM_PWMIConfig(TIM3, &TIM_ICInitStructure); // 配置TIM3的PWMI模式输入捕获
+
+    // 6. 配置TRGI的触发源为TI1FP1
+    TIM_SelectInputTrigger(TIM3, TIM_TS_TI1FP1); // 选择触发源为TI1FP1
+
+    // 7. 配置从模式为Reset
+    TIM_SelectSlaveMode(TIM3, TIM_SlaveMode_Reset); // 设置从模式为复位模式
+
+    // 8. 启动定时器
+    TIM_Cmd(TIM3, ENABLE); // 使能TIM3定时器
+}
+```
+
+### PWMI模式测频率占空比函数
+
+```c
+// 返回测周法测出的占空比
+uint32_t IC_GetDuty(void)
+{
+    /*
+     * 占空比 = CCR2的计数值/CCR1的计数值
+     * CCR2的值*100则返回0~100的数值,否则返回0~1
+     * CCR2和CCR1 + 1是为了美化数据,否则测量频率和实际频率相差1(BUG)
+     */
+    return (TIM_GetCapture2(TIM3) + 1) * 100 / (TIM_GetCapture1(TIM3) + 1);
+}
+```
+
+### 实现PWMI测量频率和占空比
+
+```c
+int main(void)
+{
+	delay_init(); // 延时函数初始化
+    PWM_Init(); // TIM2的PWM初始化
+    IC_Init(); // 输入捕获初始化
+    OLED_Init(); // OLED初始化
+    
+	OLED_Clear(); // OLED清屏
+	OLED_ShowString(1, 11, "Freq:", 12); // 在(1, 11)位置显示"Freq:"字体大小12
+    OLED_ShowString(61, 11, "Hz", 12); // 在(61, 11)位置显示"Hz"字体大小12
+	OLED_ShowString(1, 31, "Duty:", 12); // 在(1, 31)位置显示"Duty:"字体大小12
+    OLED_ShowString(45, 31, "%", 12); // 在(45, 31)位置显示"%"字体大小12
+	OLED_Refresh(); // 更新显存到OLED
+
+    PWM_SetPrescaler(720-1); // 设置PSC, PWM频率为72M/720/100 = 1KHz
+    PWM_SetCompare1(50); // 设置CCR, PWM占空比为50%
+
+	while(1)
+	{
+        OLED_ShowNum(31, 11, IC_GetFreq(), 5, 12); // 在(31, 11)位置显示频率,宽度5,字体大小12
+        OLED_ShowNum(31, 31, IC_GetDuty(), 2, 12); // 在(31, 31)位置显示占空比,宽度2,字体大小12
+	    OLED_Refresh(); // 更新显存到OLED
+	}
+}
+```
