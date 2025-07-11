@@ -1,7 +1,10 @@
 /*
+ * 实验目标: 实现PWM驱动LED呼吸灯
+ *
  * LED接线:
- * 正极 -> PA0
- * 负极 -> GND
+ * 
+ * - LED正极 -> TIM2_CH1_ETR引脚(PA0)
+ * - LED负极 -> GND
  */
 
 #include "stm32f10x.h"

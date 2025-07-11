@@ -1,3 +1,30 @@
+/*
+ * 实验目标: 实现按键控制直流电机转速并在OLED显示当前速度
+ *
+ * 130电机和TB6612FNG电机驱动板连线如下:
+ *
+ * - VM -> 5V
+ * - VCC -> 3.3V
+ * - GND -> GND(需要与STM32的GND共地)
+ * - AO1 -> 电机端口1
+ * - AO2 -> 电机端口2(不分正反)
+ * - PWMA -> TIM2_CH3引脚(PA2)
+ * - AIN2 -> PA5
+ * - AIN1 -> PA4
+ * - STBY -> 3.3V
+ *
+ * OLED连接:
+ *
+ * - GND -> GND(需要与STM32的GND共地)
+ * - VDD -> 3.3V
+ * - SCK -> PG12
+ * - SDA -> PD5
+ * - RES -> PD4
+ * - DC -> PD15
+ * - CS -> PD1
+ *
+ * 按键使用霸道开发板按键(PA0)
+ */
 
 #include "stm32f10x.h"
 #include "stm32f10x_conf.h"
