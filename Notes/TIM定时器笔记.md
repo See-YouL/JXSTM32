@@ -2080,3 +2080,149 @@ int main(void)
 	}
 }
 ```
+
+## TIM编码器接口
+
+- Encoder Interface 编码器接口
+- 编码器接口可接收增量(正交)编码器的信号,根据编码器旋转产生的正交信号脉冲,自动控制CNT自增或自减,
+从而指示编码器的位置,旋转方向和旋转速度
+- 每个高级定时器和通用定时器都拥有1个编码器接口
+- 两个输入引脚借用了输入捕获的通道1和通道2
+
+### 正交编码器
+
+![正交编码器](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250712181202.png)
+
+- 通过测量其中一相的频率可以得到编码器的转速
+- 通过测量两相的相位差可以得到编码器的转向
+
+使用正交信号相比于单独定义一个方向引脚的好处:
+
+1. 正交信号精度更高,AB相都可以计次,相当于计次频率提高了一倍
+2. 正交信号可以抗噪声,两个信号交替跳变,所以可以设计一个抗噪声电路,如果一个信号跳变,另一个信号不变
+则认为产生了噪声
+
+如右侧表格所示,所示的各种状态代表正传和反转
+
+### 编码器接口的电路结构
+
+![编码器接口的电路结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250812132444.png)
+
+编码器接口有两个输入端: TI1FP1 和 TI2FP2 分别接到编码器的A相和B相
+
+编码器的两个引脚借用了输入捕获单元的两个通道,最终编码器的输入引脚就是定时器的CH1和CH2两个引脚
+
+编码器接口的输出部分其实就是相当于从模式的控制器,控制CNT的计数时钟和计数方向
+
+如果出现边沿信号,并且对应另一相的状态为正转,则控制CNT自增,否则控制CNT自减
+
+### 编码器接口的基本结构
+
+![编码器接口的基本结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250812132945.png)  
+
+1. 输入捕获的前两个通道通过GPIO口接入编码器的AB相
+2. 然后通过滤波器,边沿检测,极性选择产生TI1FP1和TI2FP2两个信号通向编码器接口
+3. 编码器接口通过预分频器控制CNT计数器的时钟
+4. 编码器接口根据编码器的旋转方向控制CNT的计数方向
+   - 如果TI1FP1和TI2FP2的相位差为正转,则CNT自增
+   - 如果TI1FP1和TI2FP2的相位差为反转,则CNT自减
+5. ARR有效,一般设置ARR为65535最大量程
+
+### 编码器接口的工作模式
+
+![编码器接口的工作模式](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250812144555.png)
+
+### 编码器工作实例
+
+![编码器工作实例均不反相](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250812144658.png)
+
+![编码器工作实例TI1反相](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250812144928.png)
+
+## 编码器接口测速实验
+
+工程文件目录: `6-8 编码器接口测速`
+
+实验目标: **实现测试编码器的转速方向**
+
+### 硬件连接(编码器接口测速实验)
+
+旋转编码器接线
+
+- VCC -> 3V3
+- GND -> GND
+- A相 -> PA6
+- B相 -> PA7
+
+如下图所示,PA6和PA7是TIM3的CH1和CH2通道
+
+![PA6PA7引脚定义](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20250813175435.png)
+
+[旋转编码器介绍](https://telesky.yuque.com/bdys8w/01/rgiv4hci8q4gbgcg)
+
+[旋转编码器购买链接](https://detail.tmall.com/item.htm?ali_trackid=2%3Amm_26632943_457000242_108858100157%2C123%3A1755078526734_557786228_0&bxsign=tbkSsSJGB2byNxu5ItVSOBLxLwyTVcFPL-B_dDWLriCfb5YYYFGwUE1qrcJIxHdfjnlegndVHRoFLGnWRU1-SY-ZwC83iB2qjd--xAMsIgV-RprHInTPFE5el7dH6va5RzAGeUZLwmK7pXzc6eHZGbLQUw_lffKk6Cxp15jAum5dFxi8GhnbVDRGE3sx-MHx84q&id=41254563868&pvid=null&relationId=3131571508&rid=3131571508&scm=null&spm=a21wu.21508199.product.mm_26632943_457000242_108858100157&unid=123&union_lens=lensId%3AOPT%401755078525%4021078e31_0ec5_198a2d5004f_32c2%4001%40eyJmbG9vcklkIjoxMDYzOTN9%3Brecoveryid%3A557786228_0%401755078526737)
+
+### 编码器接口初始化函数
+
+库函数在`stm32f10x_tim.h`中定义,如下所示
+
+```c
+void TIM_EncoderInterfaceConfig(TIM_TypeDef* TIMx, uint16_t TIM_EncoderMode,
+                                uint16_t TIM_IC1Polarity, uint16_t TIM_IC2Polarity);
+// 定时器编码器接口配置函数
+// TIMx: 定时器外设
+// TIM_EncoderMode: 编码器模式, TIM_EncoderMode_TI1, TIM_EncoderMode_TI2, TIM_EncoderMode_TI12
+// TIM_IC1Polarity: 通道1极性, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling
+// TIM_IC2Polarity: 通道2极性, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling
+```
+
+在`encoder.c`中增加`Encoder_Init`函数, 用于初始化编码器接口
+
+1. RCC开启时钟,开启GPIO和定时的时钟
+2. 配置GPIO,将PA6和PA7配置为上拉输入
+3. 配置时基单元,预分频器一般选择不分频,自动重装一般设置为65535
+4. 配置输入捕获单元,只有滤波器和极性两个参数有用
+5. 配置编码器接口模式
+6. 调用TIM_Cmd函数,开启定时器 
+
+```c
+void Encoder_Init(void)
+{
+    // 1. 开启时钟
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); // 开启IM3时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); // 开启GPIOA时钟
+
+    // 2. GPIO配置
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7; // PA6, PA7
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; // 配置为上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 设置速度
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    // 3. 配置时基单元
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; // 时钟分频
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数
+    TIM_TimeBaseStructure.TIM_Period = 65536 - 1; // 自动重装载值
+    TIM_TimeBaseStructure.Tim_Prescaler = 0; // 不分频
+    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+
+    // 4. 配置输入捕获单元
+    TIM_ICInitTypeDef TIM_ICInitStructure;
+    TIM_ICStructInit(&TIM_ICInitStructure); // 初始化结构体
+    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1; // 通道1
+    TIM_ICInitStructure.TIM_ICFilter = 0xF; // 输入滤波器
+    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 极性不反相
+    TIM_ICInit(TIM3, &TIM_ICInitStructure);
+    TIM_ICInitStructure.TIM_Channel = TIM_Channel_2; // 通道2
+    TIM_ICInitStructure.TIM_ICFilter = 0xF; // 输入滤波器
+    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising; // 极性不反相
+    TIM_ICInit(TIM3, &TIM_ICInitStructure);
+
+    // 5. 配置编码器接口
+    TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+
+    // 6. 使能定时器
+    TIM_Cmd(TIM3, ENABLE);
+
+}
+```
