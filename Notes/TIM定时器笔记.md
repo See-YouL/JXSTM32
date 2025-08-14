@@ -500,7 +500,7 @@ TIM_TimeBaseInitTypeDef结构体中`TIM_ClockDivision`成员的作用:
 
 也可理解为,对72M进行7200分频得到10kHz,在10k的频率下记10000个数需要1s时间
 
-### 主函数完善流程
+### 主函数流程(定时器中断实验)
 
 在`main.c`文件中实现
 
@@ -734,7 +734,7 @@ uint16_t Timer_GetCounter(void)
 }
 ```
 
-### 完善主函数流程
+### 主函数流程(定时器外部时钟实验)
 
 增加显示计数器的部分,在`main.c`文件中实现
 
@@ -1116,7 +1116,7 @@ void PWM_Init(void)
 
 ```
 
-### 实现呼吸灯效果
+### 主函数流程(PWM驱动LED呼吸灯实验)
 
 在`PWM.c`文件中实现一个设置CCR值的函数
 
@@ -2225,4 +2225,48 @@ void Encoder_Init(void)
     TIM_Cmd(TIM3, ENABLE);
 
 }
+```
+
+### 主函数流程(编码器接口测速实验)
+
+1. 模块初始化
+2. oled显示静态文本
+3. 死循环显示速度
+4. TIM2每隔1s触发一次中断，读取编码器计数增量值作为速度值
+
+```c
+int16_t Speed;			//定义速度变量
+
+int main(void)
+{
+    // 1. 模块初始化
+	OLED_Init();		//OLED初始化
+	Timer_Init();		//定时器初始化
+	Encoder_Init();		//编码器初始化
+	
+	// 2. OLED显示静态文本
+	OLED_ShowString(1, 1, "Speed:");		//1行1列显示字符串Speed:
+	
+    // 3. 死循环显示速度
+	while (1)
+	{
+		OLED_ShowSignedNum(1, 7, Speed, 5);	//不断刷新显示编码器测得的最新速度
+	}
+}
+
+// 4. TIM2每隔1s触发一次中断，读取编码器计数增量值作为速度值
+/**
+ * @brief TIM2中断处理函数
+ * @param None
+ * @retval None
+ */
+void TIM2_IRQHandler(void)
+{
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)		//判断是否是TIM2的更新事件触发的中断
+	{
+		Speed = Encoder_Get();								//每隔固定时间段读取一次编码器计数增量值，即为速度值
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);			//清除TIM2更新事件的中断标志位
+	}
+}
+
 ```
