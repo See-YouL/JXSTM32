@@ -49,7 +49,17 @@ PWM驱动LED呼吸灯/PWM驱动舵机/PWM驱动直流电机实验包含如下内
 - 输入捕获实验
 - PWMI模式测频率占空比实验
 
-[定时器编码器接口部分理论知识视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=19&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+[定时器编码器接口理论知识视频链接]( https://www.bilibili.com/video/BV1th411z7sn/?p=19&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+TIM编码器接口理论知识包含如下内容
+
+- TIM编码器接口
+
+[编码器接口测速视频链接](https://www.bilibili.com/video/BV1th411z7sn/?p=20&share_source=copy_web&vd_source=0db47c15b9f51dbaa4548ec2dc55dea4)
+
+编码器接口测速包含如下内容
+
+- 编码器接口测速实验
 
 ## TIM 定时器简介
 
