@@ -3,5 +3,6 @@
     "files.associations": {
         "*.c": "c",
         "oled.h": "c"
-    }
+    },
+    "commentTranslate.source": "Bing"
 }
