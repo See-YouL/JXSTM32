@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @brief 主程序文件，包含主函数和中断处理函数
+ *  旋转编码器接线说明：
+ *  - 旋转编码器VCC -> 3.3V
+ *  - 旋转编码器GND -> GND
+ *  - 旋转编码器A相 -> PA6
+ *  - 旋转编码器B相 -> PA7
+ *  OLED显示屏接线说明：
+ *  - OLED VCC -> 3.3V
+ */
 #include "stm32f10x.h"                  // Device header
 #include "delay.h"
 #include "oled.h"
