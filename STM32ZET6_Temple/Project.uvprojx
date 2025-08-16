@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Start;.\Library;.\User;.\System;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR</IncludePath>
+              <IncludePath>.\Start;.\Library;.\User;.\System\TIMER;.\System\DELAY;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -653,22 +653,22 @@
             <File>
               <FileName>Delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\Delay.c</FilePath>
+              <FilePath>.\System\DELAY\Delay.c</FilePath>
             </File>
             <File>
               <FileName>Delay.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\Delay.h</FilePath>
+              <FilePath>.\System\DELAY\Delay.h</FilePath>
             </File>
             <File>
               <FileName>Timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\Timer.c</FilePath>
+              <FilePath>.\System\TIMER\Timer.c</FilePath>
             </File>
             <File>
               <FileName>Timer.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\Timer.h</FilePath>
+              <FilePath>.\System\TIMER\Timer.h</FilePath>
             </File>
           </Files>
         </Group>

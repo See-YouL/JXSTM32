@@ -4,7 +4,7 @@
  * 该文件实现了传感器的初始化、状态获取和中断处理功能
  * @version 1.0
  * @date 2025-08-16
- * @author Eric
+ * @author 含生
  */
 #include "Sensor.h"
 #include "stm32f10x.h"
