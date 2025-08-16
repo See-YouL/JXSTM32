@@ -5,78 +5,128 @@
  * @date 2025-08-16
  * @author 含生
  */
+                                                   #include "stm32f10x.h"
+#include "Timer.h"
+
+
 #include "stm32f10x.h"
 #include "Timer.h"
 
 /**
  * @brief 定时器初始化函数
- * @note 该函数用于初始化定时器，包括时钟配置、时基单元初始化、NVIC配置等。
- *       需要在具体的 main 函数中调用，例如 Timer_Init(&Timer2Config);
- *       定时器中断回调函数需要在 Timer_Config_t 结构体中设置。
- *       该函数会使能定时器的更新中断，并在中断发生时调用用户定义的回调函数。
- *       注意：在使用定时器之前，需要先配置好 NVIC 的优先级分组。
- * @param timer: 指向Timer_Config_t结构体，包含定时器配置参数
- * @return None
+ * @note 该函数用于初始化定时器,包括时钟、配置外部时钟或内部时钟, 并配置中断
+ * @param timer 指向定时器的结构体
+ * @retval None
  */
 void Timer_Init(Timer_Config_t *timer)
 {
     // 1. 开启定时器时钟
-    RCC_APB1PeriphClockCmd(timer->TIMx_CLK, ENABLE);
+    if (timer->TIMx == TIM1) 
+    {
+        RCC_APB2PeriphClockCmd(timer->TIMx_CLK, ENABLE); // 开启TIM1时钟
+    }
+    else 
+    {
+        RCC_APB1PeriphClockCmd(timer->TIMx_CLK, ENABLE); // 开启其他TIMx时钟
+    }
 
-    // 2. 配置内部时钟
-    TIM_InternalClockConfig(timer->TIMx);
+    // 2. 配置外部时钟或内部时钟
+    if (timer->ExternalClockMode == 1 || timer->ExternalClockMode == 2)
+    {
+        if (timer->ETR_GPIO_Port)
+        {
+            // 自动开启 GPIO 时钟
+            if (timer->ETR_GPIO_Port == GPIOA) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+            else if (timer->ETR_GPIO_Port == GPIOB) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+            else if (timer->ETR_GPIO_Port == GPIOC) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+            else if (timer->ETR_GPIO_Port == GPIOD) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+            else if (timer->ETR_GPIO_Port == GPIOE) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
+
+            GPIO_InitTypeDef GPIO_InitStructure;
+            GPIO_InitStructure.GPIO_Pin = timer->ETR_GPIO_Pin; // 选择 ETR 引脚
+            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; // 浮空输入
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // 50MHz
+            GPIO_Init(timer->ETR_GPIO_Port, &GPIO_InitStructure);
+        }
+
+        if (timer->ExternalClockMode == 1) // 外部时钟模式1
+        {
+            TIM_ETRClockMode1Config(timer->TIMx, // 选择 ETR 作为时钟
+                                    timer->ExternalClockPrescaler, // 选择 ETR 前分频
+                                    timer->ExternalClockPolarity, // 选择 ETR 极性
+                                    timer->ExternalClockFilter); // 选择 ETR 滤波器
+        }
+        else // 外部时钟模式2
+        {
+            TIM_ETRClockMode2Config(timer->TIMx, // 选择 ETR 作为时钟
+                                    timer->ExternalClockPrescaler, // 选择 ETR 前分频
+                                    timer->ExternalClockPolarity, // 选择 ETR 极性
+                                    timer->ExternalClockFilter); // 选择 ETR 滤波器
+        }
+    }
+    else
+    {
+        TIM_InternalClockConfig(timer->TIMx); // 内部时钟模式
+    }
+
 
     // 3. 时基单元初始化
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-    TIM_TimeBaseInitStructure.TIM_ClockDivision = timer->ClockDivision; // 时钟分割
-    TIM_TimeBaseInitStructure.TIM_CounterMode = timer->CounterMode; // 计数器模式
-    TIM_TimeBaseInitStructure.TIM_Prescaler = timer->Prescaler; // 预分频
-    TIM_TimeBaseInitStructure.TIM_Period = timer->Period; // 自动重装载值
-    TIM_TimeBaseInitStructure.TIM_RepetitionCounter = timer->RepetitionCounter; // 重复计数器（高级定时器使用）
+    TIM_TimeBaseInitStructure.TIM_ClockDivision = timer->ClockDivision;
+    TIM_TimeBaseInitStructure.TIM_CounterMode = timer->CounterMode;
+    TIM_TimeBaseInitStructure.TIM_Prescaler = timer->Prescaler;
+    TIM_TimeBaseInitStructure.TIM_Period = timer->Period;
+    TIM_TimeBaseInitStructure.TIM_RepetitionCounter = timer->RepetitionCounter;
     TIM_TimeBaseInit(timer->TIMx, &TIM_TimeBaseInitStructure);
 
-    // 4. 清除标志位并使能更新中断
-    TIM_ClearFlag(timer->TIMx, TIM_FLAG_Update); // 清除更新标志位
-    TIM_ITConfig(timer->TIMx, TIM_IT_Update, ENABLE); // 使能更新中断
+    // 4. 清除标志位
+    TIM_ClearFlag(timer->TIMx, TIM_FLAG_Update);
 
-    // 5. NVIC分组配置
-    NVIC_PriorityGroupConfig(timer->NVIC_PriorityGroup); // 设置NVIC分组
+    // 5. 配置中断
+    if (timer->EnableInterrupt && timer->Callback) // 如果使能中断并且有中断回调函数
+    {
+        TIM_ITConfig(timer->TIMx, TIM_IT_Update, ENABLE); // 使能TIMx的更新中断
 
-    // 6. NVIC初始化
-    NVIC_InitTypeDef NVIC_InitStructure;
-    NVIC_InitStructure.NVIC_IRQChannel = timer->TIMx_IRQn; // 中断通道
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; // 使能中断
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = timer->PreemptionPriority; // 抢占优先级
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = timer->SubPriority; // 响应优先级
-    NVIC_Init(&NVIC_InitStructure);
+        NVIC_PriorityGroupConfig(timer->NVIC_PriorityGroup); // 配置NVIC分组
+        NVIC_InitTypeDef NVIC_InitStructure;
+        NVIC_InitStructure.NVIC_IRQChannel = timer->TIMx_IRQn; // 定时器2中断通道
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; // 使能NVIC通道
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = timer->PreemptionPriority; // 抢占优先级
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = timer->SubPriority; // 响应优先级
+        NVIC_Init(&NVIC_InitStructure);
+    }
 
-    // 7. 启动定时器
+    // 6. 启动定时器
     TIM_Cmd(timer->TIMx, ENABLE);
 }
 
+
 /**
- * @brief 定时器中断处理函数
- * @note 该函数用于处理定时器中断，当定时器发生更新中断时调用。
- *       在具体的中断处理函数中，需要调用此函数来处理定时器中断。
- *       该函数会检查定时器的更新中断标志位，如果标志位被设置，则清除标志位并调用用户定义的回调函数。
- *       用户需要在 Timer_Config_t 结构体中设置回调函数指针。
- * @param timer: 指向Timer_Config_t结构体，包含定时器配置参数
- * @return None
+ * @brief 获取定时器计数器的值
+ * @param timer 指向定时器的结构体
+ * @retval 计数器的值
+ */
+uint16_t Timer_GetCounter(Timer_Config_t *timer)
+{
+    return TIM_GetCounter(timer->TIMx);
+}
+
+/**
+ * @brief 定时器2中断回调函数
+ * @param timer 指向定时器的结构体
+ * @retval None
  */
 void Timer_IRQHandler(Timer_Config_t *timer)
 {
-    if (TIM_GetITStatus(timer->TIMx, TIM_IT_Update) != RESET) // 检查更新中断标志位
+    if (TIM_GetITStatus(timer->TIMx, TIM_IT_Update) != RESET)
     {
-        TIM_ClearITPendingBit(timer->TIMx, TIM_IT_Update); // 清除中断标志位
-
-        if (timer->Callback) // 检查回调函数指针是否有效
-        {
-            timer->Callback(); // 调用用户回调函数
-        }
+        TIM_ClearITPendingBit(timer->TIMx, TIM_IT_Update);
+        if (timer->Callback) timer->Callback();
     }
 }
 
-// 测试程序
+
+// 内部时钟测试函数
 // #include "stm32f10x.h"
 // #include "Delay.h"
 // #include "Oled.h"
@@ -98,8 +148,10 @@ void Timer_IRQHandler(Timer_Config_t *timer)
 //     .NVIC_PriorityGroup = NVIC_PriorityGroup_2, // NVIC优先级分组
 //     .PreemptionPriority = 2, // 抢占优先级2
 //     .SubPriority = 1, // 响应优先级1
-//     .Callback = MyTimer2Task // 定时器中断回调函数指针，用户中断处理逻辑
-// };
+//     .Callback = MyTimer2Task, // 定时器中断回调函数指针，用户中断处理逻辑
+//     .ExternalClockMode = 0,       // 1=外部时钟，0=内部时钟
+//     .EnableInterrupt = 1, // 使能中断
+//     };
 
 // int main(void)
 // {
