@@ -29,11 +29,13 @@ typedef struct
 
     void (*Callback)(void);             // 定时器中断回调函数指针，用户中断处理逻辑
 
+    // 外部时钟参数
     uint8_t ExternalClockMode;       // 2=外部时钟模式2, 1=外部时钟模式1, 0=内部时钟
     uint16_t ExternalClockPrescaler; // 外部时钟预分频
     uint16_t ExternalClockFilter;    // 外部时钟滤波
     uint16_t ExternalClockPolarity;  // 外部时钟极性
 
+    // 外部时钟引脚
     GPIO_TypeDef *ETR_GPIO_Port;       // 外部时钟ETR引脚端口
     uint16_t ETR_GPIO_Pin;             // 外部时钟ETR引脚编号
 
