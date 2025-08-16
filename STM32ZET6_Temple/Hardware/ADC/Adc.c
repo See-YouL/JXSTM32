@@ -1,5 +1,5 @@
 /**
- * @file adc.c
+ * @file Adc.c
  * @brief ADC1初始化和获取ADC值的函数实现
  * @note 该文件包含ADC1的初始化函数和获取ADC转换值的函数。(PA0, PA1, PA2, PA3)
  *       ADC1配置为单通道转换模式，使用PA0-PA3作为输入通道。

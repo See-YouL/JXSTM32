@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Start;.\Library;.\User;.\System;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC</IncludePath>
+              <IncludePath>.\Start;.\Library;.\User;.\System;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -651,24 +651,24 @@
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>delay.c</FileName>
+              <FileName>Delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\delay.c</FilePath>
+              <FilePath>.\System\Delay.c</FilePath>
             </File>
             <File>
-              <FileName>delay.h</FileName>
+              <FileName>Delay.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\delay.h</FilePath>
+              <FilePath>.\System\Delay.h</FilePath>
             </File>
             <File>
-              <FileName>timer.c</FileName>
+              <FileName>Timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\System\timer.c</FilePath>
+              <FilePath>.\System\Timer.c</FilePath>
             </File>
             <File>
-              <FileName>timer.h</FileName>
+              <FileName>Timer.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\System\timer.h</FilePath>
+              <FilePath>.\System\Timer.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -676,59 +676,59 @@
           <GroupName>Hardware</GroupName>
           <Files>
             <File>
-              <FileName>encoder.c</FileName>
+              <FileName>Led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\ENCODER\encoder.c</FilePath>
+              <FilePath>.\Hardware\LED\Led.c</FilePath>
             </File>
             <File>
-              <FileName>encoder.h</FileName>
+              <FileName>Led.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\ENCODER\encoder.h</FilePath>
+              <FilePath>.\Hardware\LED\Led.h</FilePath>
             </File>
             <File>
-              <FileName>key.c</FileName>
+              <FileName>Key.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\KEY\key.c</FilePath>
+              <FilePath>.\Hardware\KEY\Key.c</FilePath>
             </File>
             <File>
-              <FileName>key.h</FileName>
+              <FileName>Key.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\KEY\key.h</FilePath>
+              <FilePath>.\Hardware\KEY\Key.h</FilePath>
             </File>
             <File>
-              <FileName>led.c</FileName>
+              <FileName>Oled.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\LED\led.c</FilePath>
+              <FilePath>.\Hardware\OLED\Oled.c</FilePath>
             </File>
             <File>
-              <FileName>led.h</FileName>
+              <FileName>Oled.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\LED\led.h</FilePath>
+              <FilePath>.\Hardware\OLED\Oled.h</FilePath>
             </File>
             <File>
-              <FileName>oled.c</FileName>
+              <FileName>Oled_Font.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\OLED\Oled_Font.h</FilePath>
+            </File>
+            <File>
+              <FileName>Sensor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\OLED\oled.c</FilePath>
+              <FilePath>.\Hardware\SENSOR\Sensor.c</FilePath>
             </File>
             <File>
-              <FileName>oled.h</FileName>
+              <FileName>Sensor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\OLED\oled.h</FilePath>
+              <FilePath>.\Hardware\SENSOR\Sensor.h</FilePath>
             </File>
             <File>
-              <FileName>oled_font.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\OLED\oled_font.h</FilePath>
-            </File>
-            <File>
-              <FileName>adc.c</FileName>
+              <FileName>FireSensor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\ADC\adc.c</FilePath>
+              <FilePath>.\Hardware\FIRESENSOR\FireSensor.c</FilePath>
             </File>
             <File>
-              <FileName>adc.h</FileName>
+              <FileName>FireSensor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\ADC\adc.h</FilePath>
+              <FilePath>.\Hardware\FIRESENSOR\FireSensor.h</FilePath>
             </File>
           </Files>
         </Group>

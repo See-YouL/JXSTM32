@@ -1,5 +1,5 @@
 /**
- * @file led.c
+ * @file Led.c
  * @brief LED控制函数实现
  * @note 本文件实现了LED的初始化和控制函数。
  *       包括绿色、蓝色和红色LED的开关和切换功能。
