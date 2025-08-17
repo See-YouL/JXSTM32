@@ -1,27 +1,39 @@
 #ifndef __KEY_H
 #define __KEY_H
 
-// 按键宏定义
-#define KEY1_GPIO_PORT     GPIOA
-#define KEY1_GPIO_PIN      GPIO_Pin_0
-#define KEY1_GPIO_CLK      RCC_APB2Periph_GPIOA
-#define KEY2_GPIO_PORT     GPIOC
-#define KEY2_GPIO_PIN      GPIO_Pin_13
-#define KEY2_GPIO_CLK      RCC_APB2Periph_GPIOC
+#include "stm32f10x.h"
+#include <stdint.h>
+
+// 按键触发宏定义
+#define KEY_ACTIVE_HIGH   Bit_SET   // 按下为高电平
+#define KEY_ACTIVE_LOW    Bit_RESET // 按下为低电平
 
 // 按键返回值定义
-#define KEY_NONE           0
-#define KEY1_PRESSED       1
-#define KEY2_PRESSED       2
+#define KEY_NONE          0
 
-// 按键触发电平定义
-// 如果按下是高电平，设为 Bit_SET
-// 如果按下是低电平，设为 Bit_RESET
-// Bit_SET 和 Bit_RESET 是 STM32 标准库中定义的宏
-#define KEY_DOWN_LEVEL     Bit_SET
+// 按键软件消抖时间(ms)
+#define KEY_DEBOUNCE_MS   20
 
-// 函数声明
-void Key_Init(void); // 按键初始化函数
-uint8_t Key_GetNum(void); // 获取按键状态函数
+// 按键结构体
+typedef struct
+{
+    GPIO_TypeDef* GPIOx;    // GPIO端口
+    uint16_t GPIO_Pin;      // GPIO引脚
+    uint8_t ActiveLevel;    // 按下电平（KEY_ACTIVE_HIGH / KEY_ACTIVE_LOW）
+    uint8_t State;          // 当前按键状态 0=未按下 1=按下
+    uint8_t LastState;      // 上次状态
+    uint16_t Counter;       // 消抖计数
+    uint8_t KeyValue;       // 按键返回值
+} Key_TypeDef;
+
+// 按键声明
+// 示例按键定义，移植时可添加更多按键
+extern Key_TypeDef KEY1;
+extern Key_TypeDef KEY2;
+
+// API
+void Key_Init(Key_TypeDef* key);          // 初始化按键
+uint8_t Key_Scan(Key_TypeDef* key);       // 扫描单个按键状态
+uint8_t Key_ScanAll(Key_TypeDef* keys[], uint8_t keyCount); // 扫描多个按键状态
 
 #endif

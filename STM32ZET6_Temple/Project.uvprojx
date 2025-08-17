@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Start;.\Library;.\User;.\System\TIMER;.\System\DELAY;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR</IncludePath>
+              <IncludePath>.\Start;.\Library;.\User;.\System\TIMER;.\System\DELAY;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR;.\Hardware\PWM;.\Hardware\SERVO</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -729,6 +729,26 @@
               <FileName>FireSensor.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\FIRESENSOR\FireSensor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\PWM\Pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>Pwm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\PWM\Pwm.h</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\SERVO\Servo.c</FilePath>
+            </File>
+            <File>
+              <FileName>Servo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\SERVO\Servo.h</FilePath>
             </File>
           </Files>
         </Group>
