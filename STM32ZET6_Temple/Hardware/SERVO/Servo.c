@@ -1,7 +1,7 @@
 /**
  * @file Servo.c
  * @brief 舵机驱动实现文件（基于PWM配置）
- * @version 1.1
+ * @version 1.0
  * @date 2025-08-17
  */
 
@@ -25,11 +25,21 @@ static PWM_Config_t servo_pwm_config = {
     .OutputState = TIM_OutputState_Enable
 };
 
+/**
+ * @brief 舵机初始化函数
+ * @param None
+ * @return None
+ */
 void Servo_Init(void)
 {
     PWM_Init(&servo_pwm_config); // 使用配置初始化PWM
 }
 
+/**
+ * @brief 舵机设置角度函数
+ * @param angle 舵机机需要转到的角度(0-180度)
+ * @retval None
+ */
 void Servo_SetAngle(float angle)
 {
     if (angle > 180) angle = 180;

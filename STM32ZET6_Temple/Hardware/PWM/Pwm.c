@@ -1,7 +1,7 @@
 /**
  * @file PWM.c
  * @brief PWM驱动实现文件（支持可移植配置）
- * @version 1.1
+ * @version 1.0
  * @date 2025-08-17
  * @author 含生
  */
@@ -9,6 +9,13 @@
 #include "Pwm.h"
 #include "stm32f10x.h"
 
+/**
+ * @brief PWM初始化函数
+ * @note 该函数用于初始化 PWM, 包括时钟、GPIO、时基单元和输出比较
+ *     并在所选的通道上输出 PWM
+ * @param config 指向PWM配置的结构体
+ * @retval None
+ */
 void PWM_Init(PWM_Config_t *config)
 {
     // 1. 开启时钟

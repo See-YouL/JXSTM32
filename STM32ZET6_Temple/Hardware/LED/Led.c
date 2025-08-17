@@ -1,13 +1,20 @@
 #include "led.h"
 
-/* LED数组定义 */
+/**
+ * @brief LED 数组定义
+ */
 LED_TypeDef LED_Array[LED_COUNT] = {
     {GPIOB, GPIO_Pin_0},  // LEDG
     {GPIOB, GPIO_Pin_1},  // LEDB
     {GPIOB, GPIO_Pin_5}   // LEDR
 };
 
-/* LED GPIO 时钟判断函数 */
+
+/**
+ * @brief LED GPIO时钟判断函数
+ * @param GPIOx: GPIO 端口
+ * @retval None
+ */
 static void LED_EnableClock(GPIO_TypeDef* GPIOx)
 {
     if (GPIOx == GPIOA) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -17,7 +24,11 @@ static void LED_EnableClock(GPIO_TypeDef* GPIOx)
     else if (GPIOx == GPIOE) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
 }
 
-/* 初始化LED */
+/**
+ * @brief LED GPIO初始化函数
+ * @param LED_Array: LED 数组
+ * @retval None
+ */
 void LED_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -36,17 +47,17 @@ void LED_Init(void)
     }
 }
 
-/* 绿色LED */
+// 绿色LED
 void LEDG_ON(void)  { LED_ON(LED_Array[0]); }
 void LEDG_OFF(void) { LED_OFF(LED_Array[0]); }
 void LEDG_Turn(void) { LED_TOGGLE(LED_Array[0]); }
 
-/* 蓝色LED */
+// 蓝色LED
 void LEDB_ON(void)  { LED_ON(LED_Array[1]); }
 void LEDB_OFF(void) { LED_OFF(LED_Array[1]); }
 void LEDB_Turn(void) { LED_TOGGLE(LED_Array[1]); }
 
-/* 红色LED */
+// 红色LED
 void LEDR_ON(void)  { LED_ON(LED_Array[2]); }
 void LEDR_OFF(void) { LED_OFF(LED_Array[2]); }
 void LEDR_Turn(void) { LED_TOGGLE(LED_Array[2]); }
