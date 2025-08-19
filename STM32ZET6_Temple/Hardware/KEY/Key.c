@@ -1,3 +1,11 @@
+/**
+ * @file   Key.c
+ * @brief  按键功能实现
+ * @note 该文件包含按键实例的定义,按键初始化函数,按键扫描函数
+ * @version 1.0
+ * @date 2025-08-17
+ * @author 含生
+ */
 #include "Key.h"
 
 // 按键实例定义
@@ -120,3 +128,45 @@ uint8_t Key_ScanAll(Key_TypeDef* keys[], uint8_t keyCount)
     }
     return KEY_NONE;
 }
+
+// /*
+// 硬件连线:
+// LEDG负极 -> PB0
+// LEDR负极 -> PB5
+// Key1 -> PA0
+// Key2 -> PC13
+// */
+// #include "stm32f10x.h"
+// #include "Delay.h"
+// #include "Led.h"
+// #include "Key.h"
+
+// uint8_t KeyNum = 0;   // 按键编号变量
+// int16_t Speed = 0;    // 电机速度变量，扩展为int16_t以支持负数
+// Key_TypeDef* KeyArray[] = { &KEY1, &KEY2 }; // 按键数组
+// #define KEY_COUNT  (sizeof(KeyArray)/sizeof(KeyArray[0])) // 按键数组中的按键数量
+
+// int main(void)
+// {   
+//     LED_Init(); // 初始化LED
+//     for (uint8_t i = 0; i < KEY_COUNT; i++)
+//     {
+//         Key_Init(KeyArray[i]);
+//     }
+
+//     while (1)
+//     {
+//         KeyNum = Key_ScanAll(KeyArray, KEY_COUNT); // 扫描所有按键
+
+//         switch(KeyNum)
+//         {
+//             case 1: // Key1按下
+//                 LEDR_Turn();
+//                 break;
+
+//             case 2: // Key2按下
+//                 LEDG_Turn();
+//                 break;
+//         }
+//     }
+// }

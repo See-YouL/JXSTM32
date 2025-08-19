@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Start;.\Library;.\User;.\System\TIMER;.\System\DELAY;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR;.\Hardware\PWM;.\Hardware\SERVO</IncludePath>
+              <IncludePath>.\Start;.\Library;.\User;.\System\TIMER;.\System\DELAY;.\Hardware\ENCODER;.\Hardware\KEY;.\Hardware\LED;.\Hardware\OLED;.\Hardware\ADC;.\Hardware\SENSOR;.\Hardware\FIRESENSOR;.\Hardware\PWM;.\Hardware\SERVO;.\Hardware\MOTOR;.\Hardware\IC</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -749,6 +749,26 @@
               <FileName>Servo.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\SERVO\Servo.h</FilePath>
+            </File>
+            <File>
+              <FileName>Motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\MOTOR\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\MOTOR\Motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Ic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\IC\Ic.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\IC\Ic.h</FilePath>
             </File>
           </Files>
         </Group>

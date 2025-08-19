@@ -1,10 +1,3 @@
-/**
- * @file PWM.h
- * @brief PWM驱动头文件（支持可移植配置）
- * @version 1.0
- * @date 2025-08-17
- */
-
 #ifndef __PWM_H
 #define __PWM_H
 
@@ -35,6 +28,10 @@ typedef struct
 } PWM_Config_t;
 
 void PWM_Init(PWM_Config_t *config); // PWM初始化
-void PWM_SetCompare(PWM_Config_t *config, uint16_t Compare); // PWM 设定占空比
+void PWM_SetCompare(PWM_Config_t *config, uint16_t Compare); // PWM 设定占空比(CCR)
+void PWM_SetPrescaler(PWM_Config_t *config, uint16_t Prescaler); // PWM 设定预分频(PSC)
+void PWM_SetPeriod(PWM_Config_t *config, uint16_t Period); // PWM 设定周期(ARR)
+void PWM_UpdateFreqDuty(PWM_Config_t *config, uint32_t freq, float duty); // 设定PWM的频率和占空比 
+void PWM_GetFreqDuty(PWM_Config_t *config, uint32_t *freq, float *duty); // 读取实际PWM的频率和占空比
 
 #endif

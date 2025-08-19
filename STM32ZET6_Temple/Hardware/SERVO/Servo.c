@@ -52,7 +52,14 @@ void Servo_SetAngle(float angle)
     PWM_SetCompare(&servo_pwm_config, ccr_value);
 }
 
-// 舵机驱动测试函数
+// /*
+// 硬件连接: (舵机驱动测试函数)
+// Key1 -> PA0
+// Key2 -> PC13
+// OLED_SCK -> PB8
+// OLED_SDA -> PB9
+// Servo -> PA1
+// */
 // #include "stm32f10x.h"
 // #include "Delay.h"
 // #include "Key.h"

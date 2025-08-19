@@ -5,10 +5,6 @@
  * @date 2025-08-16
  * @author 含生
  */
-                                                   #include "stm32f10x.h"
-#include "Timer.h"
-
-
 #include "stm32f10x.h"
 #include "Timer.h"
 
@@ -126,7 +122,11 @@ void Timer_IRQHandler(Timer_Config_t *timer)
 }
 
 
-// 内部时钟测试函数
+// /*
+// 硬件连线:(Tim内部时钟测试)
+// OLED_SCK -> PB8
+// OLED_SDA -> PB9
+// */
 // #include "stm32f10x.h"
 // #include "Delay.h"
 // #include "Oled.h"
@@ -194,7 +194,12 @@ void Timer_IRQHandler(Timer_Config_t *timer)
 // }
 
 
-// 外部时钟测试函数(使用传感器不敏感)
+// /*
+// 硬件连接:(Tim外部时钟测试, 不敏感)
+// PA0 -> 传感器
+// OLED_SCK -> PB8
+// OLED_SDA -> PB9
+// */
 // #include "stm32f10x.h"
 // #include "Delay.h"
 // #include "Oled.h"

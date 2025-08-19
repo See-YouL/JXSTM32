@@ -18,6 +18,7 @@
  * 注意事项: 当火焰强度超过阈值时,输出低电平,否则输出高电平
  * 传感器连接方法: DO 接 PB14
  */
+
 /**
  * @brief 火焰传感器配置
  * 该结构体定义了火焰传感器的GPIO、EXTI和NVIC配置
@@ -88,38 +89,41 @@ void EXTI15_10_IRQHandler(void)
     Sensor_IRQHandler(&FireSensorConfig);
 }
 
-/* 测试函数
-#include "stm32f10x.h"
-#include "Delay.h"
-#include "Oled.h"
-#include "Sensor.h"
-#include "FireSensor.h"
+// /*
+// 硬件连线：
+// PB14 (DO) -> 火焰传感器
+// OLED_SCK -> PB8
+// OLED_SDA -> PB9
+// */
+// #include "stm32f10x.h"
+// #include "Delay.h"
+// #include "Oled.h"
+// #include "Sensor.h"
+// #include "FireSensor.h"
 
 
-int main(void)
-{
-    OLED_Init();  
-    OLED_Clear();
-    Fire_Init(); // 初始化火焰传感器
+// int main(void)
+// {
+//     OLED_Init();  
+//     OLED_Clear();
+//     Fire_Init(); // 初始化火焰传感器
 
-    while (1)
-    {
-        // 判断火焰传感器状态
-        if (Fire_GetState() == 1)
-        {
-            OLED_Clear();
-            OLED_ShowString(1, 1, "Fire Warning");
+//     while (1)
+//     {
+//         // 判断火焰传感器状态
+//         if (Fire_GetState() == 1)
+//         {
+//             OLED_Clear();
+//             OLED_ShowString(1, 1, "Fire Warning");
 
-            // 状态显示一次后清零
-            Fire_ClearState();
-        }
-        else
-        {
-            OLED_Clear();
-            OLED_ShowString(1, 1, "StandBy");
-        }
-        Delay_ms(500);
-    }
-}
-
-*/
+//             // 状态显示一次后清零
+//             Fire_ClearState();
+//         }
+//         else
+//         {
+//             OLED_Clear();
+//             OLED_ShowString(1, 1, "StandBy");
+//         }
+//         Delay_ms(500);
+//     }
+// }

@@ -1,4 +1,12 @@
-#include "led.h"
+/**
+ * @file Led.c
+ * @brief LED驱动函数
+ * @note 该文件包含 LED初始化函数和 LED 数组定义
+ * @version 1.0
+ * @date 2025-08-17
+ * @author 含生
+ */
+#include "Led.h"
 
 /**
  * @brief LED 数组定义
@@ -62,6 +70,12 @@ void LEDR_ON(void)  { LED_ON(LED_Array[2]); }
 void LEDR_OFF(void) { LED_OFF(LED_Array[2]); }
 void LEDR_Turn(void) { LED_TOGGLE(LED_Array[2]); }
 
+// /*
+// 硬件连线：
+// LEDG负极 -> PB0
+// LEDB负极 -> PB1
+// LEDR负极 -> PB5
+// */
 // LED驱动测试函数
 // #include "stm32f10x.h"
 // #include "Delay.h"
