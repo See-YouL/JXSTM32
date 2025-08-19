@@ -8,23 +8,23 @@
  */
 typedef struct
 {
-    TIM_TypeDef *TIMx;           // 定时器
-    uint32_t TIMx_CLK;           // 定时器时钟
-    uint16_t Prescaler;          // 预分频
-    uint16_t Period;             // 自动重装载值
-    uint16_t Pulse;              // 初始占空比
-
     uint8_t Channel;             // 通道号 (1~4)
 
-    GPIO_TypeDef *GPIOx;         // GPIO端口
-    uint16_t GPIO_Pin;           // GPIO引脚
-
+    TIM_TypeDef *TIMx;           // 定时器
+    uint32_t TIMx_CLK;           // 定时器时钟
     uint16_t ClockDivision;      // 时钟分频
     uint16_t CounterMode;        // 计数模式
+    uint16_t Period;             // 自动重装载值
+    uint16_t Prescaler;          // 预分频
+    uint8_t  RepetitionCounter;  // 重复计数器 (高级定时器用)
 
     uint16_t OCMode;             // 输出比较模式 (如 TIM_OCMode_PWM1)
     uint16_t OCPolarity;         // 输出极性 (如 TIM_OCPolarity_High/Low)
     uint16_t OutputState;        // 输出使能 (TIM_OutputState_Enable/Disable)
+    uint16_t Pulse;              // 初始占空比
+
+    GPIO_TypeDef *GPIOx;         // GPIO端口
+    uint16_t GPIO_Pin;           // GPIO引脚
 } PWM_Config_t;
 
 void PWM_Init(PWM_Config_t *config); // PWM初始化

@@ -29,10 +29,13 @@ typedef struct
 
     uint16_t SlaveMode;          // 从模式选择 (TIM_SlaveMode_Reset/Trigger/External1 等)
     uint16_t TriggerSource;      // 触发源选择 (TIM_TS_TI1FP1/TIM_TS_TI2FP2/ETRF 等)
+    uint8_t  UsePWMI; // 0=普通输入捕获, 1=PWM输入捕获
 
 } IC_Config_t;
 
 void IC_Init(IC_Config_t *config);   // 输入捕获初始化
-uint32_t IC_GetFreq(IC_Config_t *config); // 获取输入频率
+uint32_t IC_GetCapture(IC_Config_t *config, uint8_t which);
+uint32_t IC_GetFreq(IC_Config_t *config); // 获取输入频率(测周法)
+uint8_t IC_GetDuty(IC_Config_t *config); // 获取占空比(测周法)
 
 #endif
