@@ -13,3 +13,16 @@
 
 ### 存储器映像
 
+![存储器映像](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20251107122814076.png)
+
+### DMA框图
+
+![DMA框图](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20251107123927902.png)
+
+### DMA基本结构
+
+![DMA基本结构](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20251107130143600.png)
+
+### DMA请求
+
+![DMA请求](https://raw.githubusercontent.com/See-YouL/PicGoFhotos/master/20251107131128296.png)
